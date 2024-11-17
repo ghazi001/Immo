@@ -85,12 +85,12 @@ function NewProject() {
   const [titre, setTitre] = useState(null);
   const [date, setDate] = useState(null);
   const [surface, setSurface] = useState(null);
-  const [perimetre, setPerimetre] = useState(null);
   const [topologie, setTopologie] = useState(null);
   const [houseType, setHouseType] = useState(null);
   const [standingType, setStandingType] = useState(null);
   const [nbrCars, setNbrCars] = useState(null);
   const [nbrRooms, setNbrRooms] = useState(null);
+  const [funding, setFunding] = useState(null);
 
   const handleChangeVille = (event: SelectChangeEvent) => {
     let ville = event.target.value;
@@ -145,10 +145,13 @@ function NewProject() {
     let topologie = event.target.value;
     setTopologie(topologie);
   };
+  const handleChangeFund = (event: SelectChangeEvent) => {
+    let fund = event.target.value;
+    setFunding(fund);
+  };
 
   const handleNext = () => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
-    if (activeStep + 1 === steps.length) setOpen(true);
   };
 
   const handleBack = () => {
@@ -461,19 +464,6 @@ function NewProject() {
                               </FormControl>
                             </MDBox>
                           </Grid>
-                          <Grid item xs={12} md={6} xl={6}>
-                            <MDBox pr={1}>
-                              <MDInput
-                                name="perimetre"
-                                type="text"
-                                value={perimetre}
-                                label="P&eacute;rim&ecirc;tre"
-                                onChange={(e) => {
-                                  setPerimetre(e.target.value);
-                                }}
-                              />
-                            </MDBox>
-                          </Grid>
                         </Grid>
                       </MDBox>
                     </Card>
@@ -556,12 +546,26 @@ function NewProject() {
                 {activeStep === steps.length ? (
                   <Fragment>
                     <MDTypography sx={{ mt: 2, mb: 1 }}>
-                      Toutes les &eacute;tapes sont termin&eacute;es
+                      Comment comptez-vous financier votre projet de construction?
                     </MDTypography>
+                    <FormControl variant="standard" sx={{ marginLeft: "50px", minWidth: 200 }}>
+                      <InputLabel m={4}>Financement *</InputLabel>
+                      <Select
+                        style={{ height: "30px" }}
+                        value={funding}
+                        onChange={handleChangeFund}
+                        label="Financement *"
+                      >
+                        <MenuItem value="Epargne personnelle">Epargne personnelle</MenuItem>
+                        <MenuItem value="Prêt bancaire">Pr&ecirc;t bancaire</MenuItem>
+                        <MenuItem value="Autre">Autre</MenuItem>
+                        <MenuItem value="Je ne sais pas">Je ne sais pas</MenuItem>
+                      </Select>
+                    </FormControl>
                     <MDBox sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
                       <MDBox sx={{ flex: "1 1 auto" }} />
                       <MDButton color="inherit" onClick={handleOpen}>
-                        Voir l&apos;estimation
+                        Estimer
                       </MDButton>
                     </MDBox>
                   </Fragment>
