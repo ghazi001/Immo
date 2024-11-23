@@ -1,7 +1,6 @@
 import Dashboard from "layouts/dashboard";
 import Profile from "layouts/profile";
 import NewProject from "layouts/projects/Estimation du bien";
-import Notifications from "layouts/notifications";
 import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
 
@@ -16,6 +15,7 @@ const routes = [
     icon: <Icon fontSize="small">dashboard</Icon>,
     route: "/dashboard",
     component: <Dashboard />,
+    state: "Showed",
   },
   {
     type: "collapse",
@@ -24,6 +24,7 @@ const routes = [
     icon: <Icon fontSize="small">person</Icon>,
     route: "/profile",
     component: <Profile />,
+    state: "Connected",
   },
   {
     type: "collapse",
@@ -32,22 +33,34 @@ const routes = [
     icon: <Icon fontSize="small">home</Icon>,
     route: "/newProject",
     component: <NewProject />,
+    state: "Showed",
   },
   {
     type: "collapse",
-    name: "Sign In",
+    name: "Se connecter",
     key: "sign-in",
     icon: <Icon fontSize="small">login</Icon>,
     route: "/authentication/sign-in",
     component: <SignIn />,
+    state: "Disconnected",
   },
   {
     type: "collapse",
-    name: "Sign Up",
+    name: "S'inscrire",
     key: "sign-up",
     icon: <Icon fontSize="small">assignment</Icon>,
     route: "/authentication/sign-up",
     component: <SignUp />,
+    state: "Disconnected",
+  },
+  {
+    type: "collapse",
+    name: "Se d\u00e9connecter",
+    key: "exit",
+    icon: <Icon fontSize="small">logout</Icon>,
+    route: "/Dashboard",
+    component: <Dashboard />,
+    state: "Connected",
   },
 ];
 

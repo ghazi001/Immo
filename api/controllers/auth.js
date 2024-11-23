@@ -40,7 +40,7 @@ export const login = (req, res) => {
 
     db.query(q, [req.body.username], (err, data) => {
         if (err) return res.status(500).json(err);
-        if (data.length === 0) return res.status(404).json("User not found!");
+        if (data.length === 0) return res.status(404).json("L'utilisateur n'existe pas!");
 
         const checkPassword = bcrypt.compareSync(
             req.body.password,
@@ -48,7 +48,7 @@ export const login = (req, res) => {
         );
 
         if (!checkPassword)
-            return res.status(400).json("Wrong password or username!");
+            return res.status(400).json("Incorrect password ou username!");
 
         const token = jwt.sign({ id: data[0].id }, "secretkey");
 
@@ -64,7 +64,6 @@ export const login = (req, res) => {
 };
 
 export const logout = (req, res) => {
-    console.log("Logout")
     res.clearCookie("accessToken", {
         secure: true,
         sameSite: "none"
