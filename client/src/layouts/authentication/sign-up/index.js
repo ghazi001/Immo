@@ -8,7 +8,6 @@ import CoverLayout from "layouts/authentication/components/CoverLayout";
 import axios from "axios";
 import bgImage from "assets/images/bg-sign-up-cover.jpeg";
 import DashboardLayout from "../../../examples/LayoutContainers/DashboardLayout";
-import DashboardNavbar from "../../../examples/Navbars/DashboardNavbar";
 import { useState } from "react";
 import MDSnackbar from "../../../components/MDSnackbar";
 
@@ -68,7 +67,6 @@ const Register = () => {
   );
   return (
     <DashboardLayout>
-      <DashboardNavbar />
       <CoverLayout image={bgImage}>
         <Card>
           <MDBox
@@ -82,14 +80,14 @@ const Register = () => {
             mb={1}
             textAlign="center"
           >
-            <MDTypography variant="h4" fontWeight="medium" color="white" mt={1}>
+            <MDTypography variant="h4" fontWeight="medium" color="white" mt={0}>
               Rejoindre nous
             </MDTypography>
-            <MDTypography display="block" variant="button" color="white" my={1}>
+            <MDTypography display="block" variant="button" color="white" my={0}>
               Entrez votre donnee pour vous inscrire
             </MDTypography>
           </MDBox>
-          <MDBox pt={4} pb={3} px={3}>
+          <MDBox pt={2} pb={3} px={3}>
             <MDBox component="form" role="form">
               <MDBox mb={2}>
                 <MDInput
