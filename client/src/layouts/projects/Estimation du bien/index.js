@@ -1,8 +1,8 @@
-import { Fragment, useState } from "react";
+import { Fragment, useState, useEffect, useContext } from "react";
 import Stepper from "@mui/material/Stepper";
 import Step from "@mui/material/Step";
 import StepLabel from "@mui/material/StepLabel";
-// @mui material components
+import { useNavigate } from "react-router-dom";
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
@@ -10,6 +10,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import ProfileInfoCard from "examples/Cards/InfoCards/ProfileInfoCard";
+import { AuthContext } from "context/authContext";
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
@@ -31,8 +32,7 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import MDInput from "../../../components/MDInput";
-import { useEffect } from "react";
-const steps = ["Localisation", "Titre", "Description", "Type"];
+const steps = ["Localisation", "Titre", "Description", "Type", "Financement"];
 
 const style = {
   position: "absolute",
@@ -72,6 +72,7 @@ const totalMax = subtotalMax(rows);
 function NewProject() {
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
+  const handleNavigate = () => currentUser == null ? navigate("/authentication/sign-in") : handleOpen();
   const handleClose = () => setOpen(false);
   const [activeStep, setActiveStep] = useState(0);
   const [ville, setVille] = useState(null);
@@ -91,6 +92,8 @@ function NewProject() {
   const [nbrCars, setNbrCars] = useState(null);
   const [nbrRooms, setNbrRooms] = useState(null);
   const [funding, setFunding] = useState(null);
+  const { currentUser } = useContext(AuthContext);
+  const navigate = useNavigate();
 
   const handleChangeVille = (event: SelectChangeEvent) => {
     let ville = event.target.value;
@@ -295,10 +298,10 @@ function NewProject() {
                   <Grid item xs={12} lg={12} m={3}>
                     <Card>
                       <MDBox pr={1} m={3}>
-                        <MDTypography ml={2} mb={3}>
+                        <MDTypography ml={2}>
                           Renseignez la localisation de votre terrain
                         </MDTypography>
-                        <Grid container spacing={6} p={3}>
+                        <Grid container spacing={2} p={3}>
                           <Grid item xs={12} md={6} xl={6}>
                             <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
                               <InputLabel pl={3}>Ville *</InputLabel>
@@ -380,10 +383,10 @@ function NewProject() {
                   <Grid item xs={12} lg={12} m={3}>
                     <Card>
                       <MDBox pr={1} m={3}>
-                        <MDTypography ml={2} mb={3}>
+                        <MDTypography ml={2}>
                           Avez-vous un titre de propri&eacute;t&eacute; sur ce terrain ?
                         </MDTypography>
-                        <Grid container spacing={6} p={3}>
+                        <Grid container spacing={2} p={3}>
                           <Grid item xs={12} md={6} xl={6}>
                             <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
                               <InputLabel pl={3}>Titre propri&eacute;t&eacute; *</InputLabel>
@@ -426,10 +429,10 @@ function NewProject() {
                   <Grid item xs={12} lg={12} m={3}>
                     <Card>
                       <MDBox pr={1} m={3}>
-                        <MDTypography ml={2} mb={3}>
+                        <MDTypography ml={2}>
                           Description du terrain ?
                         </MDTypography>
-                        <Grid container spacing={6} p={3}>
+                        <Grid container spacing={2} p={3}>
                           <Grid item xs={12} md={6} xl={6}>
                             <MDBox pr={1}>
                               <MDInput
@@ -473,10 +476,10 @@ function NewProject() {
                   <Grid item xs={12} lg={12} m={3}>
                     <Card>
                       <MDBox pr={1} m={3}>
-                        <MDTypography ml={2} mb={3}>
+                        <MDTypography ml={2}>
                           Type de bien ?
                         </MDTypography>
-                        <Grid container spacing={6} p={3}>
+                        <Grid container spacing={2} p={3}>
                           <Grid item xs={12} md={6} xl={6}>
                             <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
                               <InputLabel pl={3}>Type de maison *</InputLabel>
@@ -543,33 +546,32 @@ function NewProject() {
                     </Card>
                   </Grid>
                 )}
-                {activeStep === steps.length ? (
-                  <Fragment>
-                    <MDTypography sx={{ mt: 2, mb: 1 }}>
-                      Comment comptez-vous financier votre projet de construction?
-                    </MDTypography>
-                    <FormControl variant="standard" sx={{ marginLeft: "50px", minWidth: 200 }}>
-                      <InputLabel m={4}>Financement *</InputLabel>
-                      <Select
-                        style={{ height: "30px" }}
-                        value={funding}
-                        onChange={handleChangeFund}
-                        label="Financement *"
-                      >
-                        <MenuItem value="Epargne personnelle">Epargne personnelle</MenuItem>
-                        <MenuItem value="Prêt bancaire">Pr&ecirc;t bancaire</MenuItem>
-                        <MenuItem value="Autre">Autre</MenuItem>
-                        <MenuItem value="Je ne sais pas">Je ne sais pas</MenuItem>
-                      </Select>
-                    </FormControl>
-                    <MDBox sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
-                      <MDBox sx={{ flex: "1 1 auto" }} />
-                      <MDButton color="inherit" onClick={handleOpen}>
-                        Estimer
-                      </MDButton>
-                    </MDBox>
-                  </Fragment>
-                ) : (
+                {activeStep === 4 && (
+                  <Grid item xs={12} lg={12} m={3}>
+                    <Card>
+                      <MDBox pr={1} m={3}>
+                        <MDTypography sx={{ mt: 2, mb: 1 }}>
+                          Comment comptez-vous financier votre projet de construction?
+                        </MDTypography>
+                        <FormControl variant="standard" sx={{ marginLeft: "50px", minWidth: 200 }}>
+                          <InputLabel m={4}>Financement *</InputLabel>
+                          <Select
+                            style={{ height: "30px" }}
+                            value={funding}
+                            onChange={handleChangeFund}
+                            label="Financement *"
+                          >
+                            <MenuItem value="Epargne personnelle">Epargne personnelle</MenuItem>
+                            <MenuItem value="Prêt bancaire">Pr&ecirc;t bancaire</MenuItem>
+                            <MenuItem value="Autre">Autre</MenuItem>
+                            <MenuItem value="Je ne sais pas">Je ne sais pas</MenuItem>
+                          </Select>
+                        </FormControl>
+                      </MDBox>
+                    </Card>
+                  </Grid>
+                )}
+                {activeStep < steps.length && (
                   <Fragment>
                     <MDBox sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
                       <MDButton
@@ -581,8 +583,8 @@ function NewProject() {
                         Retour
                       </MDButton>
                       <MDBox sx={{ flex: "1 1 auto" }} />
-                      <MDButton onClick={handleNext}>
-                        {activeStep === steps.length - 1 ? "Terminer" : "Suivant"}
+                      <MDButton onClick={activeStep === steps.length - 1 ? handleNavigate : handleNext}>
+                        {activeStep === steps.length - 1 ? "Estimer" : "Suivant"}
                       </MDButton>
                     </MDBox>
                   </Fragment>
