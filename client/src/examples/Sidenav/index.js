@@ -10,13 +10,13 @@ import MDTypography from "components/MDTypography";
 import SidenavCollapse from "examples/Sidenav/SidenavCollapse";
 import SidenavRoot from "examples/Sidenav/SidenavRoot";
 import sidenavLogoLabel from "examples/Sidenav/styles/sidenav";
+import { AuthContext } from "context/authContext";
 import {
   useMaterialUIController,
   setMiniSidenav,
   setTransparentSidenav,
   setWhiteSidenav,
 } from "context";
-import { AuthContext } from "context/authContext";
 
 function Sidenav({ color, brand, brandName, routes, ...rest }) {
   const [controller, dispatch] = useMaterialUIController();

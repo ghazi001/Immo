@@ -14,7 +14,7 @@ import { AuthContext } from "context/authContext";
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
-import { subtotalMin, subtotalMoy, subtotalMax } from "./common.tsx";
+import { subtotalMin, subtotalMoy, subtotalMax, rows, style } from "./common.tsx";
 import MDTypography from "components/MDTypography";
 import MDButton from "components/MDButton";
 
@@ -34,37 +34,6 @@ import Paper from "@mui/material/Paper";
 import MDInput from "../../../components/MDInput";
 const steps = ["Localisation", "Titre", "Description", "Type", "Financement"];
 
-const style = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: "80%",
-  bgcolor: "background.paper",
-  boxShadow: 24,
-  p: 4,
-};
-
-const rows = [
-  createRow("Terrassement", 228480, 245280, 262080),
-  createRow("Peinture", 1795200, 1927200, 2059200),
-  createRow("Plomberie sanitaire assainissement", 3264000, 3504000, 3744000),
-  createRow("Menuiserie aluminium", 0, 0, 0),
-  createRow("Carrelage-revetement", 1632000, 1752000, 1872000),
-  createRow("Charpente couverture", 3590400, 3854400, 4118400),
-  createRow("Abord-jardin", 0, 0, 0),
-  createRow("Electricite", 2284800, 2452800, 2620800),
-  createRow("Etancheite", 261120, 280320, 299520),
-  createRow("Faux-plafond", 1680960, 1804560, 1928160),
-  createRow("Ferronnerie", 930240, 998640, 1067040),
-  createRow("Menuiserie quincaillerie", 3916800, 4204800, 4492800),
-  createRow("Maconnerie grosoeuvre", 13056000, 14016000, 14976000),
-];
-
-function createRow(desc, min, moy, max) {
-  return { desc, min, moy, max };
-}
-
 const totalMin = subtotalMin(rows);
 const totalMoy = subtotalMoy(rows);
 const totalMax = subtotalMax(rows);
@@ -75,7 +44,7 @@ function NewProject() {
   const handleNavigate = () => currentUser == null ? navigate("/authentication/sign-in") : handleOpen();
   const handleClose = () => setOpen(false);
   const [activeStep, setActiveStep] = useState(0);
-  const [ville, setVille] = useState(null);
+  const [ville, setVille] = useState(JSON.parse(localStorage.getItem("ville")) || null);
   const [villes, setVilles] = useState(null);
   const [commune, setCommune] = useState(null);
   const [communes, setCommunes] = useState(null);
@@ -85,7 +54,7 @@ function NewProject() {
   const [quarters, setQuarters] = useState(null);
   const [titre, setTitre] = useState(null);
   const [date, setDate] = useState(null);
-  const [surface, setSurface] = useState(null);
+  const [surface, setSurface] = useState(JSON.parse(localStorage.getItem("surface")) || null);
   const [topologie, setTopologie] = useState(null);
   const [houseType, setHouseType] = useState(null);
   const [standingType, setStandingType] = useState(null);
@@ -97,8 +66,9 @@ function NewProject() {
 
   const handleChangeVille = (event: SelectChangeEvent) => {
     let ville = event.target.value;
+    localStorage.setItem("ville", JSON.stringify(ville));
     setVille(ville);
-    fetch(`http://localhost:8800/api/data/communes/${ville.id}`)
+    fetch(`http://188.165.231.114:8800/api/data/communes/${ville.id}`)
       .then((res) => res.json())
       .then((data) => {
         setCommunes(data);
@@ -108,22 +78,18 @@ function NewProject() {
   const handleChangeCommune = (event: SelectChangeEvent) => {
     let commune = event.target.value;
     setCommune(commune);
-    fetch(`http://localhost:8800/api/data/quarters/${commune.id}`)
+    fetch(`http://188.165.231.114:8800/api/data/quarters/${commune.id}`)
       .then((res) => res.json())
       .then((data) => {
         setQuarters(data);
       });
-    fetch(`http://localhost:8800/api/data/zones/${commune.id}`)
+    fetch(`http://188.165.231.114:8800/api/data/zones/${commune.id}`)
       .then((res) => res.json())
       .then((data) => {
         setZones(data);
       });
   };
 
-  const handleChangeZone = (event: SelectChangeEvent) => {
-    let zone = event.target.value;
-    setZone(zone);
-  };
   const handleChangeQuarter = (event: SelectChangeEvent) => {
     let quarter = event.target.value;
     setQuarter(quarter);
@@ -162,9 +128,9 @@ function NewProject() {
   };
 
   useEffect(() => {
-    fetch("http://localhost:8800/api/data/cities")
+    fetch("http://188.165.231.114:8800/api/data/cities")
       .then((res) => res.json())
-      .then((data) => {
+        .then((data) => {
         setVilles(data);
       });
   }, []);
@@ -341,7 +307,7 @@ function NewProject() {
                           <Grid item xs={12} md={6} xl={6}>
                             <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
                               <InputLabel pl={3}>Zone</InputLabel>
-                              <Select value={zone} onChange={handleChangeZone} label="Zone *">
+                              <Select value={zone} onChange={(e)=> {setZone(e.target.value);localStorage.setItem("zone", JSON.stringify(e.target.value));}} label="Zone *">
                                 <MenuItem value="">
                                   <em>Aucun</em>
                                 </MenuItem>
@@ -441,6 +407,7 @@ function NewProject() {
                                 value={surface}
                                 label="Surface *"
                                 onChange={(e) => {
+                                  localStorage.setItem("surface", JSON.stringify(e.target.value));
                                   setSurface(e.target.value);
                                 }}
                               />
