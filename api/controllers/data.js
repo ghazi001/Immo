@@ -36,7 +36,6 @@ export const getZones = (req, res) => {
 
 export const getQuarters = (req, res) => {
     const id = req.params.Id;
-    console.log(id)
 
     const q = "SELECT * FROM quartiers WHERE id_commune=?";
 

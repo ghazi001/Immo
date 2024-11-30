@@ -8,10 +8,12 @@ import CoverLayout from "layouts/authentication/components/CoverLayout";
 import axios from "axios";
 import bgImage from "assets/images/bg-sign-up-cover.jpeg";
 import DashboardLayout from "../../../examples/LayoutContainers/DashboardLayout";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import MDSnackbar from "../../../components/MDSnackbar";
+import { AuthContext } from "../../../context/authContext";
 
 const Register = () => {
+  const { waitnigToSignIn, setIsLogIn, setWaitingToSignIn } = useContext(AuthContext);
   const [successSB, setSuccessSB] = useState(false);
   const [errorSB, setErrorSB] = useState(false);
   const [inputs, setInputs] = useState({
@@ -33,7 +35,15 @@ const Register = () => {
     e.preventDefault();
     try {
       await axios.post("http://localhost:8800/api/auth/register", inputs);
-      setSuccessSB(true);
+        setSuccessSB(true);
+        if (waitnigToSignIn) {
+            setIsLogIn(true)
+            setWaitingToSignIn(false)
+            navigate("/newProject");
+        }
+        else {
+            navigate("/");
+        }
     } catch (err) {
       setErr(err.response == undefined ? "Probléme de connexion au BD" : err.response.data);
       setErrorSB(true);
