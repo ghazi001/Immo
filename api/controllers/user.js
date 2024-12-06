@@ -12,24 +12,6 @@ export const getUser = (req, res) => {
     });
 };
 
-export const getUsers = (req, res) => {
-    console.log("started");
-
-    const q = `SELECT * FROM users`;
-
-    db.query(q, (err, data) => {
-        if (err) {
-            return res.status(500).json(err);
-            console.log("Error");
-        }
-        return res.status(200).json(data);
-    });
-};
-
-export const test = (req, res) => {
-    return res.send("Its wroks !!")
-};
-
 export const updateUser = (req, res) => {
     const token = req.cookies.accessToken;
     if (!token) return res.status(401).json("Not authenticated!");

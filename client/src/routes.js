@@ -1,44 +1,35 @@
-import Dashboard from "layouts/dashboard";
-import Profile from "layouts/profile";
-import NewProject from "layouts/projects/Estimation du bien";
+import NewProject from "./layouts/projects/newProject";
+import Projects from "./layouts/projects";
 import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
 
 // @mui icons
 import Icon from "@mui/material/Icon";
+import AddHoweWorkIcon from '@mui/icons-material/AddHomeWork';
 
 const routes = [
   {
     type: "collapse",
-    name: "Dashboard",
-    key: "dashboard",
-    icon: <Icon fontSize="small">dashboard</Icon>,
-    route: "/dashboard",
-    component: <Dashboard />,
-    state: "Showed",
-  },
-  {
-    type: "collapse",
-    name: "Profile",
-    key: "profile",
-    icon: <Icon fontSize="small">person</Icon>,
-    route: "/profile",
-    component: <Profile />,
+    name: "Mes projets",
+    key: "mes-projets",
+    icon: <Icon fontSize="small">source</Icon>,
+    route: "/mes-projets",
+    component: <Projects />,
     state: "Connected",
   },
   {
     type: "collapse",
     name: "Estimation du projet",
-    key: "newProject",
-    icon: <Icon fontSize="small">home</Icon>,
-    route: "/newProject",
+    key: "nouveau-Projet",
+    icon: <AddHoweWorkIcon fontSize="small" />,
+    route: "/nouveau-Projet",
     component: <NewProject />,
     state: "Showed",
   },
   {
     type: "collapse",
     name: "Se connecter",
-    key: "sign-in",
+    key: "authentication/sign-in",
     icon: <Icon fontSize="small">login</Icon>,
     route: "/authentication/sign-in",
     component: <SignIn />,
@@ -47,7 +38,7 @@ const routes = [
   {
     type: "collapse",
     name: "S'inscrire",
-    key: "sign-up",
+    key: "authentication/sign-up",
     icon: <Icon fontSize="small">assignment</Icon>,
     route: "/authentication/sign-up",
     component: <SignUp />,
@@ -58,8 +49,8 @@ const routes = [
     name: "Se d\u00e9connecter",
     key: "exit",
     icon: <Icon fontSize="small">logout</Icon>,
-    route: "/Dashboard",
-    component: <Dashboard />,
+    route: "/mes-projets",
+    component: <Projects />,
     state: "Connected",
   },
 ];

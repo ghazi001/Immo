@@ -5,6 +5,22 @@ interface Row {
   max: number;
 }
 
+export function Initialize() {
+    localStorage.setItem("ville", JSON.stringify(null));
+    localStorage.setItem("commune", JSON.stringify(null));
+    localStorage.setItem("quarter", JSON.stringify(null));
+    localStorage.setItem("zone", JSON.stringify(null));
+    localStorage.setItem("titre", JSON.stringify(null));
+    localStorage.setItem("date", JSON.stringify(null));
+    localStorage.setItem("houseType", JSON.stringify(null));
+    localStorage.setItem("standingType", JSON.stringify(null));
+    localStorage.setItem("nbrCars", JSON.stringify(null));
+    localStorage.setItem("nbrRooms", JSON.stringify(0));
+    localStorage.setItem("surface", JSON.stringify(0));
+    localStorage.setItem("topologie", JSON.stringify(null));
+    localStorage.setItem("funding", JSON.stringify(null));
+}
+
 export function subtotalMin(items: readonly Row[]) {
   return items.map(({ min }) => min).reduce((sum, i) => sum + i, 0);
 }

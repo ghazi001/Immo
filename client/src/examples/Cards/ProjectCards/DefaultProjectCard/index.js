@@ -28,10 +28,30 @@ import Tooltip from "@mui/material/Tooltip";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDButton from "components/MDButton";
-import MDAvatar from "components/MDAvatar";
+import dayjs from "dayjs";
 
-function DefaultProjectCard({ image, label, title, description, action }) {
-  return (
+function DefaultProjectCard({ image, label, project, title, description, action }) {
+    const InitializeProject = () => {
+        var ville = {id: project.villeId, ville: project.ville}
+        var commune = {id: project.communeId, commune: project.commune}
+        var zone = {id: project.zoneId, zone: project.zone}
+        var quartier = {id: project.quartierId, quartier: project.quartier}
+        var date = dayjs(project.dateTitre).format("YYYY-MM-DD");
+        localStorage.setItem("ville", JSON.stringify(ville));
+        localStorage.setItem("commune", JSON.stringify(commune));
+        localStorage.setItem("quarter", JSON.stringify(quartier));
+        localStorage.setItem("zone", JSON.stringify(zone));
+        localStorage.setItem("titre", JSON.stringify(project.titre));
+        localStorage.setItem("date", JSON.stringify(date));
+        localStorage.setItem("houseType", JSON.stringify(project.typeMaison));
+        localStorage.setItem("standingType", JSON.stringify(project.typeStanding));
+        localStorage.setItem("nbrCars", JSON.stringify(project.garage));
+        localStorage.setItem("nbrRooms", JSON.stringify(project.nbrPiece));
+        localStorage.setItem("surface", JSON.stringify(project.surface));
+        localStorage.setItem("topologie", JSON.stringify(project.topologie));
+        localStorage.setItem("funding", JSON.stringify(project.financement));
+    }
+    return (
     <Card
       sx={{
         display: "flex",
@@ -95,6 +115,7 @@ function DefaultProjectCard({ image, label, title, description, action }) {
               variant="outlined"
               size="small"
               color={action.color}
+              onClick={InitializeProject}
             >
               {action.label}
             </MDButton>
@@ -107,6 +128,7 @@ function DefaultProjectCard({ image, label, title, description, action }) {
               variant="outlined"
               size="small"
               color={action.color}
+              onClick={InitializeProject}
             >
               {action.label}
             </MDButton>

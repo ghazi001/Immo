@@ -14,7 +14,7 @@ import { AuthContext } from "context/authContext";
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
-import { subtotalMin, subtotalMoy, subtotalMax, rows, style } from "./common.tsx";
+import { subtotalMin, subtotalMoy, subtotalMax, rows, style, Initialize } from "./common.tsx";
 import MDTypography from "components/MDTypography";
 import MDButton from "components/MDButton";
 
@@ -22,7 +22,7 @@ import MDButton from "components/MDButton";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
-import { Box, FormControl, Icon, InputLabel, MenuItem, Modal, Select, Typography } from "@mui/material";
+import { Box, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, Icon, InputLabel, MenuItem, Modal, Select, Typography } from "@mui/material";
 import { Divider } from "@mui/material";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -32,6 +32,8 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import MDInput from "../../../components/MDInput";
+import dayjs from "dayjs";
+import axios from "axios";
 const steps = ["Localisation", "Titre", "Description", "Type", "Financement"];
 
 const totalMin = subtotalMin(rows);
@@ -41,12 +43,15 @@ const totalMax = subtotalMax(rows);
 function NewProject() {
     const { currentUser, isLogIn, setWaitingToSignIn } = useContext(AuthContext);
     const [open, setOpen] = useState(isLogIn);
+    const [openConfirm, setOpenConfirm] = useState(false);
     const navigate = useNavigate();
     const handleOpen = () => setOpen(true);
-    const handleNavigate = () => funding == null ? setErr(true) : (currentUser == null ? ( setErr(false), setWaitingToSignIn(true), navigate("/authentication/sign-in")) : handleOpen());
-    const handleClose = () => setOpen(false);
+    const handleNavigate = () => funding == null ? setErr(true) : (currentUser == null ? (setErr(false), setWaitingToSignIn(true), navigate("/authentication/sign-in")) : handleOpen());
+    const handleClose = () => setOpenConfirm(true);
+    const handleCloseConfirm = () => (setOpenConfirm(false), setOpen(false));
     const [activeStep, setActiveStep] = useState(isLogIn ? 4 : 0);
     const [err, setErr] = useState(false);
+    const [errMessage, setErrMessage] = useState("");
     const [ville, setVille] = useState(JSON.parse(localStorage.getItem("ville")) || null);
     const [villes, setVilles] = useState(null);
     const [commune, setCommune] = useState(JSON.parse(localStorage.getItem("commune")) || null);
@@ -78,7 +83,7 @@ function NewProject() {
         setQuarters(null);
         setZone(null);
         setZones(null);
-        fetch(`http://localhost:8800/api/data/communes/${ville.id}`)
+        fetch(`${url}/api/data/communes/${ville.id}`)
             .then((res) => res.json())
             .then((data) => {
                 setCommunes(data);
@@ -93,12 +98,12 @@ function NewProject() {
         setCommune(commune);
         setQuarter(null);
         setZone(null);
-        fetch(`http://localhost:8800/api/data/quarters/${commune.id}`)
+        fetch(`${url}/api/data/quarters/${commune.id}`)
             .then((res) => res.json())
             .then((data) => {
                 setQuarters(data);
             });
-        fetch(`http://localhost:8800/api/data/zones/${commune.id}`)
+        fetch(`${url}/api/data/zones/${commune.id}`)
             .then((res) => res.json())
             .then((data) => {
                 setZones(data);
@@ -160,26 +165,53 @@ function NewProject() {
         setActiveStep((prevActiveStep) => prevActiveStep - 1);
     };
 
+    const handleSave = async () => {
+        const project = {
+            villeId: ville.id,
+            communeId: commune.id,
+            quartierId: quarter.id,
+            zoneId: zone.id,
+            titre: titre,
+            dateTitre: date,
+            typeMaison: houseType,
+            typeStanding: standingType,
+            garage: nbrCars,
+            nbrPiece: nbrRooms,
+            surface: surface,
+            topologie: topologie,
+            financement: funding,
+            userId: currentUser.id,
+        };
+        try {
+            await axios.post("${url}/api/projects/addProject", project);
+            Initialize();
+            setOpenConfirm(false);
+            setOpen(false);
+            navigate("/mes-projets")
+        } catch (err) {
+            setErrMessage(err.response == undefined ? "Probléme de connexion au BD" : err.response.data);
+        }
+    };
     useEffect(() => {
-        fetch("http://localhost:8800/api/data/cities")
+        fetch("${url}/api/data/cities")
             .then((res) => res.json())
             .then((data) => {
                 setVilles(data);
             });
         if (ville != null) {
-            fetch(`http://localhost:8800/api/data/communes/${ville.id}`)
+            fetch(`${url}/api/data/communes/${ville.id}`)
                 .then((res) => res.json())
                 .then((data) => {
                     setCommunes(data);
                 });
         }
         if (commune != null) {
-            fetch(`http://localhost:8800/api/data/quarters/${commune.id}`)
+            fetch(`${url}/api/data/quarters/${commune.id}`)
                 .then((res) => res.json())
                 .then((data) => {
                     setQuarters(data);
                 });
-            fetch(`http://localhost:8800/api/data/zones/${commune.id}`)
+            fetch(`${url}/api/data/zones/${commune.id}`)
                 .then((res) => res.json())
                 .then((data) => {
                     setZones(data);
@@ -195,10 +227,10 @@ function NewProject() {
             aria-describedby="modal-modal-description"
         >
             <Card sx={style}>
-                <MDButton sx={{position: "absolute", top:-20, right:-20, zIndex:1}} variant="gradient" color="primary" size="medium" circular iconOnly onClick={handleClose}>
+                <MDButton sx={{ position: "absolute", top: -20, right: -20, zIndex: 1 }} variant="gradient" color="primary" size="medium" circular iconOnly onClick={handleClose}>
                     <Icon>close</Icon>
                 </MDButton>
-                <Grid container sx={{overflow: "auto", scrollbarWidth: "none"}} >
+                <Grid container sx={{ overflow: "auto", scrollbarWidth: "none" }} >
                     <Grid item xs={12} md={6} xl={6} pr={3}>
                         <Box mb={2}>
                             <Typography id="modal-modal-title" variant="h6" component="h2">
@@ -332,7 +364,7 @@ function NewProject() {
                                                             <InputLabel pl={3}>Ville </InputLabel>
                                                             {villes &&
                                                                 <Select sx={{ height: 44 }}
-                                                                    value={villes?.find(x => x.id == ville.id)}
+                                                                    value={villes?.find(x => x.id == ville?.id)}
                                                                     onChange={handleChangeVille}
                                                                     label="Ville *" isRequired>
                                                                     {villes &&
@@ -349,7 +381,7 @@ function NewProject() {
                                                         <FormControl required sx={{ mx: "10%", minWidth: "80%" }}>
                                                             <InputLabel pl={3}>Commmune </InputLabel>
                                                             {communes && <Select sx={{ height: 44 }}
-                                                                value={commune != null ? communes?.find(x => x.id == commune.id) : null}
+                                                                value={commune != null ? communes?.find(x => x.id == commune?.id) : null}
                                                                 onChange={handleChangeCommune}
                                                                 label="Commmune *"
                                                             >
@@ -368,7 +400,7 @@ function NewProject() {
                                                             <InputLabel pb={3}>Zone</InputLabel>
                                                             {zones &&
                                                                 <Select sx={{ height: 44 }}
-                                                                    value={zone != null ? zones?.find(x => x.id == zone.id) : null}
+                                                                    value={zone != null ? zones?.find(x => x.id == zone?.id) : null}
                                                                     onChange={(e) => {
                                                                         setZone(e.target.value);
                                                                         localStorage.setItem("zone", JSON.stringify(e.target.value));
@@ -388,7 +420,7 @@ function NewProject() {
                                                             <InputLabel pl={3}>Quarter</InputLabel>
                                                             {quarters &&
                                                                 <Select sx={{ height: 44 }}
-                                                                    value={quarter != null ? quarters?.find(x => x.id == quarter.id) : null}
+                                                                    value={quarter != null ? quarters?.find(x => x.id == quarter?.id) : null}
                                                                     onChange={handleChangeQuarter}
                                                                     label="Quarter"
                                                                 >
@@ -441,8 +473,12 @@ function NewProject() {
                                                                 <DemoContainer components={["DatePicker"]} sx={{ mx: "10%", minWidth: "80%" }}>
                                                                     <DatePicker
                                                                         label="Date d'obtention"
-                                                                        value={date}
-                                                                        onChange={(newValue) => setDate(newValue)}
+                                                                        format="DD/MM/YYYY"
+                                                                        value={dayjs(date)}
+                                                                        onChange={(newValue) => {
+                                                                            localStorage.setItem("date", JSON.stringify(newValue.format("YYYY-MM-DD")));
+                                                                            setDate(newValue)
+                                                                        }}
                                                                     />
                                                                 </DemoContainer>
                                                             </LocalizationProvider>
@@ -465,7 +501,7 @@ function NewProject() {
                                                         <MDBox sx={{ mx: "10%", minWidth: "80%" }}>
                                                             <MDInput
                                                                 name="surface"
-                                                                type="text"
+                                                                type="number"
                                                                 value={surface}
                                                                 label="Surface *"
                                                                 onChange={(e) => {
@@ -619,6 +655,35 @@ function NewProject() {
                     </Grid>
                 </Grid>
                 {renderModal}
+                <Fragment>
+                    <Dialog
+                        open={openConfirm}
+                        aria-labelledby="responsive-dialog-title"
+                    >
+                        {errMessage != "" &&
+                            <MDTypography ml={2} mt={2} color="error" fontSize={15}>
+                                {errMessage}
+                            </MDTypography>
+                        }
+                        <DialogTitle id="responsive-dialog-title">
+                            {"Voulez-vous sauvegarder ce projet?"}
+                        </DialogTitle>
+                        <DialogContent>
+                            <DialogContentText>
+                                Si vous souhaitez enregistrer ce projet dans la liste de vos projets,
+                                Cliquez sur &quot;Accepter&quot; sinon cliquez sur &quot;Refuser&quot;.
+                            </DialogContentText>
+                        </DialogContent>
+                        <DialogActions>
+                            <MDButton autoFocus onClick={handleCloseConfirm}>
+                                Refuser
+                            </MDButton>
+                            <MDButton onClick={handleSave} autoFocus>
+                                Accepter
+                            </MDButton>
+                        </DialogActions>
+                    </Dialog>
+                </Fragment>
             </MDBox>
             <Footer />
         </DashboardLayout>

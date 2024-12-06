@@ -13,7 +13,7 @@ import MDSnackbar from "../../../components/MDSnackbar";
 import { AuthContext } from "../../../context/authContext";
 
 const Register = () => {
-  const { waitnigToSignIn, setIsLogIn, setWaitingToSignIn } = useContext(AuthContext);
+  const { waitnigToSignIn, setIsLogIn, setWaitingToSignIn, url } = useContext(AuthContext);
   const [successSB, setSuccessSB] = useState(false);
   const [errorSB, setErrorSB] = useState(false);
   const [inputs, setInputs] = useState({
@@ -34,7 +34,7 @@ const Register = () => {
   const handleClick = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:8800/api/auth/register", inputs);
+        await axios.post(`${url}/api/auth/register`, inputs);
         setSuccessSB(true);
         if (waitnigToSignIn) {
             setIsLogIn(true)
