@@ -17,13 +17,18 @@ import triplexImg from "assets/images/triplex.png";
 
 import { Card } from "@mui/material";
 import { AuthContext } from "context/authContext";
+import { useNavigate } from "react-router-dom";
 
 
 function Projects() {
     const { currentUser, url} = useContext(AuthContext);
     const [projects, setProjects] = useState(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
+        if (!currentUser)
+            navigate("/authentication/sign-in")
+        else
         fetch(`${url}/api/projects/list/${currentUser.id}`)
             .then((res) => res.json())
             .then((data) => {

@@ -41,7 +41,7 @@ const totalMoy = subtotalMoy(rows);
 const totalMax = subtotalMax(rows);
 
 function NewProject() {
-    const { currentUser, isLogIn, setWaitingToSignIn } = useContext(AuthContext);
+    const { currentUser, isLogIn, setWaitingToSignIn, url } = useContext(AuthContext);
     const [open, setOpen] = useState(isLogIn);
     const [openConfirm, setOpenConfirm] = useState(false);
     const navigate = useNavigate();
@@ -183,7 +183,7 @@ function NewProject() {
             userId: currentUser.id,
         };
         try {
-            await axios.post("${url}/api/projects/addProject", project);
+            await axios.post(`${url}/api/projects/addProject`, project);
             Initialize();
             setOpenConfirm(false);
             setOpen(false);
@@ -193,7 +193,7 @@ function NewProject() {
         }
     };
     useEffect(() => {
-        fetch("${url}/api/data/cities")
+        fetch(`${url}/api/data/cities`)
             .then((res) => res.json())
             .then((data) => {
                 setVilles(data);
@@ -676,10 +676,10 @@ function NewProject() {
                         </DialogContent>
                         <DialogActions>
                             <MDButton autoFocus onClick={handleCloseConfirm}>
-                                Refuser
+                                Annuler
                             </MDButton>
                             <MDButton onClick={handleSave} autoFocus>
-                                Accepter
+                                Enregistrer
                             </MDButton>
                         </DialogActions>
                     </Dialog>
