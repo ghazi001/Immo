@@ -27,7 +27,7 @@ function Projects() {
 
     useEffect(() => {
         if (!currentUser)
-            navigate("/authentication/sign-in")
+            navigate("/nouveau-projet")
         else
         fetch(`${url}/api/projects/list/${currentUser.id}`)
             .then((res) => res.json())

@@ -1,5 +1,6 @@
 import axios from "axios";
 import { createContext, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export const AuthContext = createContext();
 
@@ -7,6 +8,7 @@ export const AuthContextProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(JSON.parse(localStorage.getItem("user")) || null);
   const [waitnigToSignIn, setWaitingToSignIn] = useState(false);
   const [isLogIn, setIsLogIn] = useState(false);
+  const navigate = useNavigate();
   const url = "http://188.165.231.114:8800";
 
   const login = async (inputs) => {
@@ -22,7 +24,8 @@ export const AuthContextProvider = ({ children }) => {
       withCredentials: true,
     });
 
-    setCurrentUser(null);
+      setCurrentUser(null);
+      navigate("/");
   };
   useEffect(() => {
     localStorage.setItem("user", JSON.stringify(currentUser));
