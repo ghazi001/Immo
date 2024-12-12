@@ -83,7 +83,7 @@ function NewProject() {
         setQuarters(null);
         setZone(null);
         setZones(null);
-        fetch(`${url}/api/data/communes/${ville.id}`)
+        fetch(`${url}/api/data/communes?villeId=${ville.id}`)
             .then((res) => res.json())
             .then((data) => {
                 setCommunes(data);
@@ -98,12 +98,12 @@ function NewProject() {
         setCommune(commune);
         setQuarter(null);
         setZone(null);
-        fetch(`${url}/api/data/quarters/${commune.id}`)
+        fetch(`${url}/api/data/quarters?communeId=${commune.id}`)
             .then((res) => res.json())
             .then((data) => {
                 setQuarters(data);
             });
-        fetch(`${url}/api/data/zones/${commune.id}`)
+        fetch(`${url}/api/data/zones?communeId=${commune.id}`)
             .then((res) => res.json())
             .then((data) => {
                 setZones(data);
@@ -199,19 +199,19 @@ function NewProject() {
                 setVilles(data);
             });
         if (ville != null) {
-            fetch(`${url}/api/data/communes/${ville.id}`)
+            fetch(`${url}/api/data/communes?villeId=${ville.id}`)
                 .then((res) => res.json())
                 .then((data) => {
                     setCommunes(data);
                 });
         }
         if (commune != null) {
-            fetch(`${url}/api/data/quarters/${commune.id}`)
+            fetch(`${url}/api/data/quarters?communeId=${commune.id}`)
                 .then((res) => res.json())
                 .then((data) => {
                     setQuarters(data);
                 });
-            fetch(`${url}/api/data/zones/${commune.id}`)
+            fetch(`${url}/api/data/zones?communeId=${commune.id}`)
                 .then((res) => res.json())
                 .then((data) => {
                     setZones(data);

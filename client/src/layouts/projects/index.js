@@ -29,7 +29,7 @@ function Projects() {
         if (!currentUser)
             navigate("/nouveau-projet")
         else
-        fetch(`${url}/api/projects/list/${currentUser.id}`)
+        fetch(`${url}/api/projects/list?userId=${currentUser.id}`)
             .then((res) => res.json())
             .then((data) => {
                 setProjects(data);

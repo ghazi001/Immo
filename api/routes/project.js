@@ -3,7 +3,7 @@ import { getProjectsByUserId, getProjects, addProject } from "../controllers/pro
 
 const router = express.Router()
 
-router.get("/list/:UserId", getProjectsByUserId)
+router.get("/list", getProjectsByUserId)
 router.get("/", getProjects)
 router.post("/addProject", addProject)
 

@@ -4,9 +4,9 @@ import { getCities, getmunicipalities, getZones, getQuarters } from "../controll
 const router = express.Router()
 
 router.get("/cities", getCities)
-router.get("/communes/:Id", getmunicipalities)
-router.get("/zones/:Id", getZones)
-router.get("/quarters/:Id", getQuarters)
+router.get("/communes", getmunicipalities)
+router.get("/zones", getZones)
+router.get("/quarters", getQuarters)
 
 
 export default router

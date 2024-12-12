@@ -14,7 +14,7 @@ export const getCities = (req, res) => {
 };
 
 export const getmunicipalities = (req, res) => {
-    const id = req.params.Id;
+    const id = req.query.villeId;
     const q = "SELECT * FROM communes WHERE id_ville=?";
 
     db.query(q, [id], (err, data) => {
@@ -25,7 +25,7 @@ export const getmunicipalities = (req, res) => {
 
 
 export const getZones = (req, res) => {
-    const id = req.params.Id;
+    const id = req.query.communeId;
     const q = "SELECT * FROM zones WHERE id_commune=?";
 
     db.query(q, [id], (err, data) => {
@@ -35,7 +35,7 @@ export const getZones = (req, res) => {
 };
 
 export const getQuarters = (req, res) => {
-    const id = req.params.Id;
+    const id = req.query.communeId;
 
     const q = "SELECT * FROM quartiers WHERE id_commune=?";
 
