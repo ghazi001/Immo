@@ -9,12 +9,10 @@ import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import ProfileInfoCard from "examples/Cards/InfoCards/ProfileInfoCard";
 import { AuthContext } from "context/authContext";
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
-import { subtotalMin, subtotalMoy, subtotalMax, rows, style, Initialize } from "./common.tsx";
 import MDTypography from "components/MDTypography";
 import MDButton from "components/MDButton";
 
@@ -22,38 +20,26 @@ import MDButton from "components/MDButton";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
-import { Box, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, Icon, InputLabel, MenuItem, Modal, Select, Typography } from "@mui/material";
-import { Divider } from "@mui/material";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
+import { FormControl, InputLabel, MenuItem, Modal, Select } from "@mui/material";
+
 import MDInput from "../../../components/MDInput";
 import dayjs from "dayjs";
-import axios from "axios";
+import ShowEstimate from "../showEstimate";
+import MDSnackbar from "../../../components/MDSnackbar";
 const steps = ["Localisation", "Titre", "Description", "Type", "Financement"];
 
-const totalMin = subtotalMin(rows);
-const totalMoy = subtotalMoy(rows);
-const totalMax = subtotalMax(rows);
 
 function NewProject() {
     const { currentUser, isLogIn, setWaitingToSignIn, url } = useContext(AuthContext);
     const [open, setOpen] = useState(isLogIn);
-    const [openConfirm, setOpenConfirm] = useState(false);
     const navigate = useNavigate();
-    const handleOpen = () => setOpen(true);
     const handleNavigate = () => funding == null ? setErr(true) : (currentUser == null ? (setErr(false), setWaitingToSignIn(true), navigate("/authentication/sign-in")) : handleOpen());
-    const handleClose = () => setOpenConfirm(true);
-    const handleCloseConfirm = () => (setOpenConfirm(false), setOpen(false));
+    const handleClose = () => setOpen(true);
     const [activeStep, setActiveStep] = useState(isLogIn ? 4 : 0);
     const [err, setErr] = useState(false);
-    const [errMessage, setErrMessage] = useState("");
     const [ville, setVille] = useState(JSON.parse(localStorage.getItem("ville")) || null);
     const [villes, setVilles] = useState(null);
+    const [project, setPorject] = useState(null);
     const [commune, setCommune] = useState(JSON.parse(localStorage.getItem("commune")) || null);
     const [communes, setCommunes] = useState(null);
     const [zone, setZone] = useState(JSON.parse(localStorage.getItem("zone")) || null);
@@ -69,6 +55,8 @@ function NewProject() {
     const [nbrCars, setNbrCars] = useState(JSON.parse(localStorage.getItem("nbrCars")) || null);
     const [nbrRooms, setNbrRooms] = useState(JSON.parse(localStorage.getItem("nbrRooms")) || 0);
     const [funding, setFunding] = useState(JSON.parse(localStorage.getItem("funding")) || null);
+    const [warningSB, setWarningSB] = useState(false);
+    const closeWarningSB = () => setWarningSB(false);
 
 
     const handleChangeVille = (event: SelectChangeEvent) => {
@@ -108,6 +96,26 @@ function NewProject() {
             .then((data) => {
                 setZones(data);
             });
+    };
+
+    const handleOpen = () => {
+        const project = {
+            ville: ville,
+            commune: commune,
+            quarter: quarter,
+            zone: zone,
+            titre: titre,
+            date: date,
+            houseType: houseType,
+            standingType: standingType,
+            garage: nbrCars,
+            nbrRooms: nbrRooms,
+            surface: surface,
+            topologie: topologie,
+            funding: funding,
+        };
+        setPorject(project);
+        setOpen(true);
     };
 
     const handleChangeQuarter = (event: SelectChangeEvent) => {
@@ -165,33 +173,6 @@ function NewProject() {
         setActiveStep((prevActiveStep) => prevActiveStep - 1);
     };
 
-    const handleSave = async () => {
-        const project = {
-            villeId: ville.id,
-            communeId: commune.id,
-            quartierId: quarter.id,
-            zoneId: zone.id,
-            titre: titre,
-            dateTitre: date,
-            typeMaison: houseType,
-            typeStanding: standingType,
-            garage: nbrCars,
-            nbrPiece: nbrRooms,
-            surface: surface,
-            topologie: topologie,
-            financement: funding,
-            userId: currentUser.id,
-        };
-        try {
-            await axios.post(`${url}/api/projects/addProject`, project);
-            Initialize();
-            setOpenConfirm(false);
-            setOpen(false);
-            navigate("/mes-projets")
-        } catch (err) {
-            setErrMessage(err.response == undefined ? "Probléme de connexion au BD" : err.response.data);
-        }
-    };
     useEffect(() => {
         fetch(`${url}/api/data/cities`)
             .then((res) => res.json())
@@ -219,6 +200,19 @@ function NewProject() {
         }
     }, []);
 
+    const renderWarningSB = (
+        <MDSnackbar
+            color="warning"
+            icon="warning"
+            title="Impossible d'ajouter la p&eacute;rsonnalisation"
+            content="V&eacute;rifier les donn&eacute;es qui ont &eacute;t&eacute; saisis!!!"
+            dateTime="à l'instant"
+            open={warningSB}
+            onClose={closeWarningSB}
+            close={closeWarningSB}
+        />
+    );
+
     const renderModal = (
         <Modal
             open={open}
@@ -226,103 +220,7 @@ function NewProject() {
             aria-labelledby="modal-modal-title"
             aria-describedby="modal-modal-description"
         >
-            <Card sx={style}>
-                <MDButton sx={{ position: "absolute", top: -20, right: -20, zIndex: 1 }} variant="gradient" color="primary" size="medium" circular iconOnly onClick={handleClose}>
-                    <Icon>close</Icon>
-                </MDButton>
-                <Grid container sx={{ overflow: "auto", scrollbarWidth: "none" }} >
-                    <Grid item xs={12} md={6} xl={6} pr={3}>
-                        <Box mb={2}>
-                            <Typography id="modal-modal-title" variant="h6" component="h2">
-                                Estimation du projet
-                            </Typography>
-                            <Typography id="modal-modal-description" sx={{ mt: 2, fontSize: 14 }} component="h6">
-                                <b>Notre proposition:</b>
-                                <br />
-                                {houseType} {nbrRooms}P {standingType} avec une surface utile de {surface} m&sup2;
-                                <br />
-                                Garage de {nbrCars}
-                            </Typography>
-                        </Box>
-                        <Card>
-                            <ProfileInfoCard
-                                title="Details du projet"
-                                info={{
-                                    ville: `${ville?.ville}`,
-                                    commune: `${commune?.commune}`,
-                                    quartier: `${quarter?.quartier}`,
-                                    zone: `${zone?.zone}`,
-                                    surface: `${surface} m\u00b2`,
-                                    "type de bien": titre,
-                                    "Nombres de pieces": nbrRooms,
-                                    standing: standingType,
-                                    garage: nbrCars,
-                                }}
-                                social={[]}
-                                action={{}}
-                                shadow={true}
-                                editable={false}
-                            />
-                        </Card>
-                    </Grid>
-                    <Grid item xs={12} md={6} xl={6}>
-                        <Typography id="modal-modal-title" variant="h6" component="h2">
-                            Estimation du budget de construction:
-                        </Typography>
-                        <TableContainer component={Paper} sx={{ mt: 2, maxHeight: 500 }}>
-                            <Table aria-label="spanning table">
-                                <>
-                                    <TableRow>
-                                        <TableCell sx={{ fontWeight: 500 }} align="center" colSpan={2}>
-                                            Details
-                                        </TableCell>
-                                        <TableCell sx={{ fontWeight: 500 }} align="center" colSpan={3}>
-                                            Price
-                                        </TableCell>
-                                    </TableRow>
-                                    <TableRow>
-                                        <TableCell colSpan={2} sx={{ fontWeight: 500 }}>
-                                            Designation
-                                        </TableCell>
-                                        <TableCell sx={{ fontWeight: 500 }}>Min</TableCell>
-                                        <TableCell sx={{ fontWeight: 500 }}>Budget estim&eacute;</TableCell>
-                                        <TableCell sx={{ fontWeight: 500 }}>Max</TableCell>
-                                    </TableRow>
-                                </>
-                                <>
-                                    {rows.map((row) => (
-                                        <TableRow key={row.desc}>
-                                            <TableCell colSpan={2}>{row.desc}</TableCell>
-                                            <TableCell align="right">
-                                                {new Intl.NumberFormat("fr-FR").format(row.min)}
-                                            </TableCell>
-                                            <TableCell align="right">
-                                                {new Intl.NumberFormat("fr-FR").format(row.moy)}
-                                            </TableCell>
-                                            <TableCell align="right">
-                                                {new Intl.NumberFormat("fr-FR").format(row.max)}
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
-                                    <TableRow>
-                                        <TableCell></TableCell>
-                                        <TableCell sx={{ fontWeight: 500 }}>Total</TableCell>
-                                        <TableCell align="right">
-                                            {new Intl.NumberFormat("fr-FR").format(totalMin)}
-                                        </TableCell>
-                                        <TableCell align="right">
-                                            {new Intl.NumberFormat("fr-FR").format(totalMoy)}
-                                        </TableCell>
-                                        <TableCell align="right">
-                                            {new Intl.NumberFormat("fr-FR").format(totalMax)}
-                                        </TableCell>
-                                    </TableRow>
-                                </>
-                            </Table>
-                        </TableContainer>
-                    </Grid>
-                </Grid>
-            </Card>
+            <ShowEstimate project={project} setOpen={setOpen} setWarningSB={setWarningSB} />
         </Modal>
     );
     return (
@@ -477,7 +375,7 @@ function NewProject() {
                                                                         value={dayjs(date)}
                                                                         onChange={(newValue) => {
                                                                             localStorage.setItem("date", JSON.stringify(newValue.format("YYYY-MM-DD")));
-                                                                            setDate(newValue)
+                                                                            setDate(newValue.format("YYYY-MM-DD"))
                                                                         }}
                                                                     />
                                                                 </DemoContainer>
@@ -654,36 +552,37 @@ function NewProject() {
                         </Card>
                     </Grid>
                 </Grid>
+                {renderWarningSB}
                 {renderModal}
-                <Fragment>
-                    <Dialog
-                        open={openConfirm}
-                        aria-labelledby="responsive-dialog-title"
-                    >
-                        {errMessage != "" &&
-                            <MDTypography ml={2} mt={2} color="error" fontSize={15}>
-                                {errMessage}
-                            </MDTypography>
-                        }
-                        <DialogTitle id="responsive-dialog-title">
-                            {"Voulez-vous sauvegarder ce projet?"}
-                        </DialogTitle>
-                        <DialogContent>
-                            <DialogContentText>
-                                Si vous souhaitez enregistrer ce projet dans la liste de vos projets,
-                                Cliquez sur &quot;Accepter&quot; sinon cliquez sur &quot;Refuser&quot;.
-                            </DialogContentText>
-                        </DialogContent>
-                        <DialogActions>
-                            <MDButton autoFocus onClick={handleCloseConfirm}>
-                                Annuler
-                            </MDButton>
-                            <MDButton onClick={handleSave} autoFocus>
-                                Enregistrer
-                            </MDButton>
-                        </DialogActions>
-                    </Dialog>
-                </Fragment>
+                {/*<Fragment>*/}
+                {/*    <Dialog*/}
+                {/*        open={openConfirm}*/}
+                {/*        aria-labelledby="responsive-dialog-title"*/}
+                {/*    >*/}
+                {/*        {errMessage != "" &&*/}
+                {/*            <MDTypography ml={2} mt={2} color="error" fontSize={15}>*/}
+                {/*                {errMessage}*/}
+                {/*            </MDTypography>*/}
+                {/*        }*/}
+                {/*        <DialogTitle id="responsive-dialog-title">*/}
+                {/*            {"Voulez-vous sauvegarder ce projet?"}*/}
+                {/*        </DialogTitle>*/}
+                {/*        <DialogContent>*/}
+                {/*            <DialogContentText>*/}
+                {/*                Si vous souhaitez enregistrer ce projet dans la liste de vos projets,*/}
+                {/*                Cliquez sur &quot;Accepter&quot; sinon cliquez sur &quot;Refuser&quot;.*/}
+                {/*            </DialogContentText>*/}
+                {/*        </DialogContent>*/}
+                {/*        <DialogActions>*/}
+                {/*            <MDButton autoFocus onClick={handleCloseConfirm}>*/}
+                {/*                Annuler*/}
+                {/*            </MDButton>*/}
+                {/*            <MDButton onClick={handleSave} autoFocus>*/}
+                {/*                Enregistrer*/}
+                {/*            </MDButton>*/}
+                {/*        </DialogActions>*/}
+                {/*    </Dialog>*/}
+                {/*</Fragment>*/}
             </MDBox>
             <Footer />
         </DashboardLayout>

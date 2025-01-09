@@ -5,6 +5,12 @@ interface Row {
   max: number;
 }
 
+export default interface Perso {
+    piece: string;
+    surface: number;
+    nombre: number;
+}
+
 export function Initialize() {
     localStorage.setItem("ville", JSON.stringify(null));
     localStorage.setItem("commune", JSON.stringify(null));
@@ -56,8 +62,19 @@ export const style = {
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
-    width: "80%",
     height: "80%",
+    bgcolor: "background.paper",
+    boxShadow: 24,
+    p: 4,
+};
+
+export const styleModal = {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    height: "80%",
+    overflowY: "hidden",
     bgcolor: "background.paper",
     boxShadow: 24,
     p: 4,
