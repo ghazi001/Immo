@@ -2,7 +2,7 @@ import { db } from "../connect.js";
 
 export const getCities = (req, res) => {
 
-    const q = `SELECT * FROM villes`;
+    const q = `SELECT * FROM zones`;
 
     db.query(q, (err, data) => {
         if (err) {
