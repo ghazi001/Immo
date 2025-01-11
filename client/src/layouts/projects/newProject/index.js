@@ -60,34 +60,22 @@ function NewProject() {
 
 
     const handleChangeVille = (event: SelectChangeEvent) => {
-        console.log("start");
-
         let ville = event.target.value;
-        console.log(ville);
         localStorage.setItem("ville", JSON.stringify(ville));
         localStorage.setItem("commune", JSON.stringify(null));
         localStorage.setItem("quarter", JSON.stringify(null));
         localStorage.setItem("zone", JSON.stringify(null));
-
-        console.log(localStorage.getItem("ville"));
         setVille(ville);
         setCommune(null);
         setQuarter(null);
         setQuarters(null);
         setZone(null);
         setZones(null);
-        try {
-           
-            fetch(`http://188.165.231.114:8060/immo/backend/getCommunes?ville=${ville.id}`)
-                .then((res) => res.json())
-                .then((data) => {
-                    console.log("Retour:");
-                    console.log(data);
-                    setCommunes(data);
-                });
-        } catch (err) {
-            console.log(err);
-        }
+        fetch(`${url}/api/data/communes?villeId=${ville.id}`)
+            .then((res) => res.json())
+            .then((data) => {
+                setCommunes(data);
+            });
     };
 
     const handleChangeCommune = (event: SelectChangeEvent) => {
