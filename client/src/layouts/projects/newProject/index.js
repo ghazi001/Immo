@@ -77,7 +77,8 @@ function NewProject() {
         setZone(null);
         setZones(null);
         try {
-            fetch(`${url}/api/data/communes?villeId=${ville.id}`)
+           
+            fetch(`http://188.165.231.114:8060/immo/backend/getCommunes?ville=${ville.id}`)
                 .then((res) => res.json())
                 .then((data) => {
                     console.log("Retour:");
