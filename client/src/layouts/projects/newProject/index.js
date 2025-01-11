@@ -60,11 +60,16 @@ function NewProject() {
 
 
     const handleChangeVille = (event: SelectChangeEvent) => {
+        console.log("start");
+
         let ville = event.target.value;
+        console.log(ville);
         localStorage.setItem("ville", JSON.stringify(ville));
         localStorage.setItem("commune", JSON.stringify(null));
         localStorage.setItem("quarter", JSON.stringify(null));
         localStorage.setItem("zone", JSON.stringify(null));
+
+        console.log(localStorage.getItem("ville"));
         setVille(ville);
         setCommune(null);
         setQuarter(null);
