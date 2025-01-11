@@ -28,7 +28,7 @@ export const getmunicipalities = (req, res) => {
 
 export const getZones = (req, res) => {
     const id = req.query.communeId;
-    const q = "SELECT * FROM zones WHERE id_commune=?";
+    const q = "SELECT * FROM zones";
 
     db.query(q, [id], (err, data) => {
         if (err) return res.status(500).json(err);
