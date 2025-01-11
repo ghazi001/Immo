@@ -14,7 +14,9 @@ export const getCities = (req, res) => {
 };
 
 export const getmunicipalities = (req, res) => {
+    console.log("Start Api:");
     const id = req.query.villeId;
+    console.log(id);
     const q = "SELECT * FROM communes WHERE id_ville=?";
 
     db.query(q, [id], (err, data) => {

@@ -76,11 +76,17 @@ function NewProject() {
         setQuarters(null);
         setZone(null);
         setZones(null);
-        fetch(`${url}/api/data/communes?villeId=${ville.id}`)
-            .then((res) => res.json())
-            .then((data) => {
-                setCommunes(data);
-            });
+        try {
+            fetch(`${url}/api/data/communes?villeId=${ville.id}`)
+                .then((res) => res.json())
+                .then((data) => {
+                    console.log("Retour:");
+                    console.log(data);
+                    setCommunes(data);
+                });
+        } catch (err) {
+            console.log(err);
+        }
     };
 
     const handleChangeCommune = (event: SelectChangeEvent) => {
