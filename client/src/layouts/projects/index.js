@@ -14,7 +14,7 @@ import duplexImg from "assets/images/duplex.png";
 import houseImg from "assets/images/house.png";
 import triplexImg from "assets/images/triplex.png";
 
-import { Card, CardMedia, Modal } from "@mui/material";
+import { Card, CardMedia, Icon, Modal } from "@mui/material";
 import { AuthContext } from "context/authContext";
 import { useNavigate } from "react-router-dom";
 import MDTypography from "../../components/MDTypography";
@@ -22,6 +22,7 @@ import MDButton from "../../components/MDButton";
 import dayjs from "dayjs";
 import MDSnackbar from "../../components/MDSnackbar";
 import ShowEstimate from "./showEstimate";
+import axios from "axios";
 
 
 function Projects() {
@@ -29,6 +30,10 @@ function Projects() {
     const [projects, setProjects] = useState(null);
     const navigate = useNavigate();
     const [warningSB, setWarningSB] = useState(false);
+    const [errorSB, setErrorSB] = useState(false);
+    const [successSB, setSuccessSB] = useState(false);
+    const closeSuccessSB = () => setSuccessSB(false);
+    const closeErrorSB = () => setErrorSB(false);
     const closeWarningSB = () => setWarningSB(false);
     const [open, setOpen] = useState(false);
     const handleClose = () => setOpen(true);
@@ -55,6 +60,18 @@ function Projects() {
         localStorage.setItem("funding", JSON.stringify(project.financement));
         navigate("/nouveau-Projet");
     }
+
+    const handleRemoveProject = async(project) => {
+        try {
+            await axios.delete(`${url}/api/projects/deleteProject?projectId=${project.id}`);
+            var list = projects;
+            list = list.filter(x => x.id != project.id);
+            setProjects(list);
+            setSuccessSB(true);
+        } catch (err) {
+            setErrorSB(true);
+        }
+    };
 
     const handleOpen = (project) => {
         var ville = { id: project.villeId, ville: project.ville }
@@ -98,12 +115,36 @@ function Projects() {
             icon="warning"
             title="Impossible d'ajouter la p&eacute;rsonnalisation"
             content="V&eacute;rifier les donn&eacute;es qui ont &eacute;t&eacute; saisis!!!"
-            dateTime="à l'instant"
             open={warningSB}
             onClose={closeWarningSB}
             close={closeWarningSB}
         />
     );
+    const renderSuccessSB = (
+        <MDSnackbar
+            color="success"
+            icon="check"
+            title="Suppression r&eacute;ussie"
+            content="Le projet a &eacute;t&eacute; supprim&eacute; avec succ&eacute;s."
+            open={successSB}
+            onClose={closeSuccessSB}
+            close={closeSuccessSB}
+            bgWhite
+        />
+    );
+    const renderErrorSB = (
+        <MDSnackbar
+            color="error"
+            icon="warning"
+            title="Erreur de suppression"
+            content="Une erreur est survenue lors de la tentative de suppression du projet."
+            open={errorSB}
+            onClose={closeErrorSB}
+            close={closeErrorSB}
+            bgWhite
+        />
+    );
+
 
     const renderModal = (
         <Modal
@@ -135,7 +176,17 @@ function Projects() {
                                                 overflow: "visible",
                                             }}
                                         >
-                                            <MDBox position="relative" width="100.25%" shadow="xl" borderRadius="xl">
+                                            <MDButton
+                                                variant="gradient"
+                                                size="medium"
+                                                color="error"
+                                                sx={{ position: "absolute", top: 0, right: 0 , zIndex:1}}
+                                                onClick={() => { handleRemoveProject(project) }}
+                                                iconOnly
+                                            >
+                                                <Icon>delete</Icon>
+                                            </MDButton>
+                                            <MDBox position="relative" width="100%" shadow="xl" borderRadius="xl">
                                                 <CardMedia
                                                     src={project.typeMaison == "Triplex" ? triplexImg : project.typeMaison == "Duplex" ? duplexImg : houseImg}
                                                     component="img"
@@ -195,6 +246,8 @@ function Projects() {
                     </MDBox>
                 </Card>
                 {renderWarningSB}
+                {renderSuccessSB}
+                {renderErrorSB}
                 {renderModal}
             </MDBox>
             <Footer />
