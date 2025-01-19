@@ -9,7 +9,7 @@ export const AuthContextProvider = ({ children }) => {
   const [waitnigToSignIn, setWaitingToSignIn] = useState(false);
   const [isLogIn, setIsLogIn] = useState(false);
   const navigate = useNavigate();
-  const url = "http://188.165.231.114:8800";
+    const url = "http://188.165.231.114:8800";
 
   const login = async (inputs) => {
     const res = await axios.post(`${url}/api/auth/login`, inputs, {
@@ -17,6 +17,15 @@ export const AuthContextProvider = ({ children }) => {
     });
 
     setCurrentUser(res.data);
+  };
+
+    const updateInfo = async (inputs) => {
+      var info = currentUser;
+      info.name = inputs.name;
+      info.email = inputs.email;
+      setCurrentUser(info);
+      localStorage.setItem("user", JSON.stringify(info));
+
   };
 
   const logout = async () => {
@@ -27,9 +36,9 @@ export const AuthContextProvider = ({ children }) => {
       setCurrentUser(null);
       navigate("/");
   };
-  useEffect(() => {
+    useEffect(() => {
     localStorage.setItem("user", JSON.stringify(currentUser));
   }, [currentUser, waitnigToSignIn, isLogIn  ]);
 
-  return <AuthContext.Provider value={{ currentUser, login, logout, waitnigToSignIn, setWaitingToSignIn, isLogIn, setIsLogIn, url}}>{children} </AuthContext.Provider>;
+    return <AuthContext.Provider value={{ currentUser, updateInfo, login, logout, waitnigToSignIn, setWaitingToSignIn, isLogIn, setIsLogIn, url}}>{children} </AuthContext.Provider>;
 };

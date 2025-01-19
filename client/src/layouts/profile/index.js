@@ -1,175 +1,265 @@
-/**
-=========================================================
-* Material Dashboard 2 React - v2.2.0
-=========================================================
 
-* Product Page: https://www.creative-tim.com/product/material-dashboard-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-
-Coded by www.creative-tim.com
-
- =========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-*/
-
-// @mui material components
 import Grid from "@mui/material/Grid";
 import Divider from "@mui/material/Divider";
 
-// @mui icons
-import FacebookIcon from "@mui/icons-material/Facebook";
-import TwitterIcon from "@mui/icons-material/Twitter";
-import InstagramIcon from "@mui/icons-material/Instagram";
-
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
-import MDTypography from "components/MDTypography";
 
 // Material Dashboard 2 React example components
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 import ProfileInfoCard from "examples/Cards/InfoCards/ProfileInfoCard";
-import ProfilesList from "examples/Lists/ProfilesList";
-import DefaultProjectCard from "examples/Cards/ProjectCards/DefaultProjectCard";
 
 // Overview page components
 import Header from "layouts/profile/components/Header";
-import PlatformSettings from "layouts/profile/components/PlatformSettings";
-
-// Data
-import profilesListData from "layouts/profile/data/profilesListData";
-
-// Images
-import homeDecor1 from "assets/images/home-decor-1.jpg";
-import homeDecor2 from "assets/images/home-decor-2.jpg";
-import homeDecor3 from "assets/images/home-decor-3.jpg";
-import homeDecor4 from "assets/images/home-decor-4.jpeg";
+import { AuthContext } from "context/authContext";
+import { useContext, useState } from "react";
+import MDButton from "../../components/MDButton";
+import MDInput from "../../components/MDInput";
+import MDTypography from "../../components/MDTypography";
+import { Card, Icon, Tooltip, Typography } from "@mui/material";
+import MDSnackbar from "../../components/MDSnackbar";
+import axios from "axios";
 
 function Overview() {
-  return (
-    <DashboardLayout>
-      <DashboardNavbar />
-      <MDBox mb={2} />
-      <Header>
-        <MDBox mt={5} mb={3}>
-          <Grid container spacing={1}>
-            <Grid item xs={12} md={6} xl={4}>
-              <PlatformSettings />
-            </Grid>
-            <Grid item xs={12} md={6} xl={4} sx={{ display: "flex" }}>
-              <Divider orientation="vertical" sx={{ ml: -2, mr: 1 }} />
-              <ProfileInfoCard
-                title="profile information"
-                description="Hi, I’m Alec Thompson, Decisions: If you can’t decide, the answer is no. If two equally difficult paths, choose the one more painful in the short term (pain avoidance is creating an illusion of equality)."
-                info={{
-                  fullName: "Alec M. Thompson",
-                  mobile: "(44) 123 1234 123",
-                  email: "alecthompson@mail.com",
-                  location: "USA",
-                }}
-                social={[
-                  {
-                    link: "https://www.facebook.com/CreativeTim/",
-                    icon: <FacebookIcon />,
-                    color: "facebook",
-                  },
-                  {
-                    link: "https://twitter.com/creativetim",
-                    icon: <TwitterIcon />,
-                    color: "twitter",
-                  },
-                  {
-                    link: "https://www.instagram.com/creativetimofficial/",
-                    icon: <InstagramIcon />,
-                    color: "instagram",
-                  },
-                ]}
-                action={{ route: "", tooltip: "Edit Profile" }}
-                shadow={false}
-              />
-              <Divider orientation="vertical" sx={{ mx: 0 }} />
-            </Grid>
-            <Grid item xs={12} xl={4}>
-              <ProfilesList title="conversations" profiles={profilesListData} shadow={false} />
-            </Grid>
-          </Grid>
-        </MDBox>
-        <MDBox pt={2} px={2} lineHeight={1.25}>
-          <MDTypography variant="h6" fontWeight="medium">
-            Projects
-          </MDTypography>
-          <MDBox mb={1}>
-            <MDTypography variant="button" color="text">
-              Architects design houses
-            </MDTypography>
-          </MDBox>
-        </MDBox>
-        <MDBox p={2}>
-          <Grid container spacing={6}>
-            <Grid item xs={12} md={6} xl={3}>
-              <DefaultProjectCard
-                image={homeDecor1}
-                label="project #2"
-                title="modern"
-                description="As Uber works through a huge amount of internal management turmoil."
-                action={{
-                  type: "internal",
-                  route: "/pages/profile/profile-overview",
-                  color: "info",
-                  label: "view project",
-                }}
-              />
-            </Grid>
-            <Grid item xs={12} md={6} xl={3}>
-              <DefaultProjectCard
-                image={homeDecor2}
-                label="project #1"
-                title="scandinavian"
-                description="Music is something that everyone has their own specific opinion about."
-                action={{
-                  type: "internal",
-                  route: "/pages/profile/profile-overview",
-                  color: "info",
-                  label: "view project",
-                }}
-              />
-            </Grid>
-            <Grid item xs={12} md={6} xl={3}>
-              <DefaultProjectCard
-                image={homeDecor3}
-                label="project #3"
-                title="minimalist"
-                description="Different people have different taste, and various types of music."
-                action={{
-                  type: "internal",
-                  route: "/pages/profile/profile-overview",
-                  color: "info",
-                  label: "view project",
-                }}
-              />
-            </Grid>
-            <Grid item xs={12} md={6} xl={3}>
-              <DefaultProjectCard
-                image={homeDecor4}
-                label="project #4"
-                title="gothic"
-                description="Why would anyone pick blue over pink? Pink is obviously a better color."
-                action={{
-                  type: "internal",
-                  route: "/pages/profile/profile-overview",
-                  color: "info",
-                  label: "view project",
-                }}
-              />
-            </Grid>
-          </Grid>
-        </MDBox>
-      </Header>
-      <Footer />
-    </DashboardLayout>
-  );
+    const [selected, setSelected] = useState(1);
+    const { currentUser, url, updateInfo } = useContext(AuthContext);
+    const [err, setErr] = useState(null);
+    const [editInfo, setEditProfile] = useState(false);
+    const [success, setSuccess] = useState(null);
+    const [successSB, setSuccessSB] = useState(false);
+    const [errorSB, setErrorSB] = useState(false);
+
+    const [inputs, setInputs] = useState({
+        username: currentUser.username,
+        email: currentUser.email,
+        name: currentUser.name,
+    });
+
+    const [passwords, setPasswords] = useState({
+        username: currentUser.username,
+        oldPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+    });
+
+    const closeErrorSB = () => setErrorSB(false);
+    const closeSuccessSB = () => setSuccessSB(false);
+
+    const handleChangeInfo = (e) => {
+        setInputs((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    };
+    const handleChangePassword = (e) => {
+        setPasswords((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    };
+
+    const handleUpdatePassword = async (e) => {
+        e.preventDefault();
+        try {
+            await axios.put(`${url}/api/users/updatePassword`, passwords);
+            setSuccess("Votre mot de passe a été changé avec succées!");
+            setSuccessSB(true);
+        } catch (err) {
+            setErr(err.response == undefined ? "Probléme de connexion au BD" : err.response.data);
+            setErrorSB(true);
+        }
+    };
+    const handleUpdateProlife = async (e) => {
+        e.preventDefault();
+        try {
+            await axios.put(`${url}/api/users/updateAccount`, inputs);
+            setSuccess("vos informations ont été modifiées changé avec succées!");
+            setSuccessSB(true);
+            setEditProfile(false);
+            updateInfo(inputs);
+        } catch (err) {
+            setErr(err.response == undefined ? "Probléme de connexion au BD" : err.response.data);
+            setErrorSB(true);
+        }
+    };
+    const renderSuccessSB = (
+        <MDSnackbar
+            color="success"
+            icon="check"
+            title="Succès"
+            content={success}
+            open={successSB}
+            onClose={closeSuccessSB}
+            close={closeSuccessSB}
+            bgWhite
+        />
+    );
+    const renderErrorSB = (
+        <MDSnackbar
+            color="error"
+            icon="warning"
+            title="Erreur"
+            content={err}
+            open={errorSB}
+            onClose={closeErrorSB}
+            close={closeErrorSB}
+            bgWhite
+        />
+    );
+    return (
+        <DashboardLayout>
+            <DashboardNavbar />
+            <MDBox mb={2} />
+            <Header setSelected={setSelected}>
+                <MDBox mt={8}>
+                    <MDBox mb={3}>
+                        <Grid container spacing={3} justifyContent="center">
+                            <Grid item xs={12} lg={8} >
+                                <Grid container spacing={3}>
+                                    {selected == 1 ? (
+
+                                        <Grid item xs={12} md={6} xl={8} sx={{ display: "wrap" }}>
+                                            {!editInfo ?
+                                                (
+                                                    <Card sx={{ height: "100%", boxShadow: "none" }}>
+                                                        <MDBox display="flex" justifyContent="space-between" alignItems="center" pt={2} px={2}>
+                                                            <MDTypography variant="h6" fontWeight="medium" textTransform="capitalize">
+                                                                Informations de profil
+                                                            </MDTypography>
+                                                            <MDTypography variant="body2" color="secondary">
+                                                                <Tooltip placement="top">
+                                                                    <Icon onClick={(e) => setEditProfile(true)}>edit</Icon>
+                                                                </Tooltip>
+                                                            </MDTypography>
+                                                        </MDBox>
+                                                        <MDBox p={2}>
+                                                            <MDBox>
+                                                                <MDBox display="flex" py={1} pr={2}>
+                                                                    <MDTypography variant="button" fontWeight="bold" textTransform="capitalize">
+                                                                        nom d&apos; utilisateur: &nbsp;
+                                                                    </MDTypography>
+                                                                    <MDTypography variant="button" fontWeight="regular" color="text">
+                                                                        &nbsp;{currentUser.username}
+                                                                    </MDTypography>
+                                                                </MDBox>
+                                                                <MDBox display="flex" py={1} pr={2}>
+                                                                    <MDTypography variant="button" fontWeight="bold" textTransform="capitalize">
+                                                                        nom et prénom: &nbsp;
+                                                                    </MDTypography>
+                                                                    <MDTypography variant="button" fontWeight="regular" color="text">
+                                                                        &nbsp;{currentUser.name}
+                                                                    </MDTypography>
+                                                                </MDBox>
+                                                                <MDBox display="flex" py={1} pr={2}>
+                                                                    <MDTypography variant="button" fontWeight="bold" textTransform="capitalize">
+                                                                        email: &nbsp;
+                                                                    </MDTypography>
+                                                                    <MDTypography variant="button" fontWeight="regular" color="text">
+                                                                        &nbsp;{currentUser.email}
+                                                                    </MDTypography>
+                                                                </MDBox>
+                                                            </MDBox>
+                                                        </MDBox>
+                                                    </Card>
+                                                ) : (
+                                                    <>
+                                                        <MDBox display="flex" justifyContent="space-between" alignItems="center" pt={2} px={2}>
+                                                            <MDTypography variant="h6" fontWeight="medium" textTransform="capitalize">
+                                                                Modifier les informations de profil
+                                                            </MDTypography>
+                                                            <MDTypography variant="body2" color="secondary">
+                                                                <Tooltip placement="top">
+                                                                    <Icon onClick={(e) => setEditProfile(false)}>close</Icon>
+                                                                </Tooltip>
+                                                            </MDTypography>
+                                                        </MDBox>
+                                                        <MDBox mt={2} pt={2} pb={3} px={3} >
+                                                            <MDBox component="form" role="form">
+                                                                <MDBox mb={2}>
+                                                                    <MDInput
+                                                                        name="name"
+                                                                        type="text"
+                                                                        label="Nom et pr&eacute;nom"
+                                                                        value={inputs.name}
+                                                                        variant="standard"
+                                                                        onChange={handleChangeInfo}
+                                                                        fullWidth
+                                                                    />
+                                                                    <Divider/>
+                                                                    <MDInput
+                                                                        name="email"
+                                                                        type="email"
+                                                                        label="Mail"
+                                                                        defaultValue={inputs.email}
+                                                                        variant="standard"
+                                                                        onChange={handleChangeInfo}
+                                                                        fullWidth
+                                                                    />
+                                                                </MDBox>
+                                                                <MDBox mt={4} mb={1}>
+                                                                    <MDButton variant="gradient" color="info" onClick={handleUpdateProlife} fullWidth>
+                                                                        Modifier
+                                                                    </MDButton>
+                                                                </MDBox>
+                                                            </MDBox>
+                                                        </MDBox>
+                                                    </>
+                                                )
+                                            }
+
+                                            <Divider orientation="vertical" sx={{ mx: 0 }} />
+                                        </Grid>
+                                    ) : (
+                                        <>
+                                            <Grid item xs={12} md={6} xl={8} sx={{ display: "wrap" }}>
+                                                <Typography variant="h6" component="h2" color="white" my={0}>
+                                                    Changer votre mot de passe
+                                                </Typography>
+                                                <MDBox mt={2} pt={2} pb={3} px={3} >
+                                                    <MDBox component="form" role="form">
+                                                        <MDBox mb={2}>
+                                                            <MDInput
+                                                                name="oldPassword"
+                                                                type="password"
+                                                                label="Ancien mot de passe"
+                                                                variant="standard"
+                                                                onChange={handleChangePassword}
+                                                                fullWidth
+                                                            />
+                                                            <MDInput
+                                                                name="newPassword"
+                                                                type="password"
+                                                                label="Nouveau mot de passe"
+                                                                variant="standard"
+                                                                onChange={handleChangePassword}
+                                                                fullWidth
+                                                            />
+                                                            <MDInput
+                                                                name="confirmPassword"
+                                                                type="password"
+                                                                label="Confirmer mot de passe"
+                                                                variant="standard"
+                                                                onChange={handleChangePassword}
+                                                                fullWidth
+                                                            />
+                                                        </MDBox>
+                                                        <MDBox mt={4} mb={1}>
+                                                            <MDButton variant="gradient" color="info" onClick={handleUpdatePassword} fullWidth>
+                                                                Modifier
+                                                            </MDButton>
+                                                        </MDBox>
+                                                    </MDBox>
+                                                </MDBox>
+                                            </Grid>
+                                        </>
+                                    )}
+                                </Grid>
+                            </Grid>
+                        </Grid>
+                    </MDBox>
+                </MDBox>
+            </Header>
+            {renderSuccessSB}
+            {renderErrorSB}
+            <Footer />
+        </DashboardLayout>
+    );
 }
 
 export default Overview;

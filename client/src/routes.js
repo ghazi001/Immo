@@ -2,6 +2,7 @@ import NewProject from "./layouts/projects/newProject";
 import Projects from "./layouts/projects";
 import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
+import Profile from "layouts/profile";
 
 // @mui icons
 import Icon from "@mui/material/Icon";
@@ -15,6 +16,15 @@ const routes = [
     icon: <Icon fontSize="small">source</Icon>,
     route: "/mes-projets",
     component: <Projects />,
+    state: "Connected",
+  },
+  {
+    type: "collapse",
+    name: "Profile",
+    key: "profile",
+    icon: <Icon fontSize="small">person</Icon>,
+    route: "/profile",
+    component: <Profile />,
     state: "Connected",
   },
   {
@@ -52,7 +62,7 @@ const routes = [
     route: "/mes-projets",
     component: <Projects />,
     state: "Connected",
-  },
+    },
 ];
 
 export default routes;
