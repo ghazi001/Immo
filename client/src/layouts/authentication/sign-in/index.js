@@ -30,8 +30,8 @@ function Basic() {
   });
   const handleLogin = async (e) => {
     e.preventDefault();
-    try {
-      await login(inputs);
+      try {
+        await login(inputs);
         if (waitnigToSignIn) {
             setIsLogIn(true)
             setWaitingToSignIn(false)

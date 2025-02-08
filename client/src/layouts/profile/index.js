@@ -9,7 +9,6 @@ import MDBox from "components/MDBox";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
-import ProfileInfoCard from "examples/Cards/InfoCards/ProfileInfoCard";
 
 // Overview page components
 import Header from "layouts/profile/components/Header";
@@ -30,6 +29,7 @@ function Overview() {
     const [success, setSuccess] = useState(null);
     const [successSB, setSuccessSB] = useState(false);
     const [errorSB, setErrorSB] = useState(false);
+    const [errorMessage, setErrorMessage] = useState(null);
 
     const [inputs, setInputs] = useState({
         username: currentUser.username,
@@ -56,7 +56,16 @@ function Overview() {
 
     const handleUpdatePassword = async (e) => {
         e.preventDefault();
+        setErrorMessage(null);
         try {
+            if (passwords.confirmPassword != passwords.newPassword) {
+                setErrorMessage("* Les mots de passe ne correspondent pas");
+                return;
+            }
+            if (passwords.newPassword.length < 6 ) {
+                setErrorMessage("* Le mot de passe doit être d'au moins 6 caractères");
+                return;
+            }
             await axios.put(`${url}/api/users/updatePassword`, passwords);
             setSuccess("Votre mot de passe a été changé avec succées!");
             setSuccessSB(true);
@@ -238,7 +247,12 @@ function Overview() {
                                                                 onChange={handleChangePassword}
                                                                 fullWidth
                                                             />
-                                                        </MDBox>
+                                                            </MDBox>
+                                                            {errorMessage != null &&
+                                                                <MDTypography variant="body2" color="error">
+                                                                    {errorMessage }
+                                                                </MDTypography>
+                                                            }
                                                         <MDBox mt={4} mb={1}>
                                                             <MDButton variant="gradient" color="info" onClick={handleUpdatePassword} fullWidth>
                                                                 Modifier

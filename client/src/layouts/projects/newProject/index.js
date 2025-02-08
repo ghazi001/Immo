@@ -31,9 +31,9 @@ const steps = ["Localisation", "Titre", "Description", "Type", "Financement"];
 
 function NewProject() {
     const { currentUser, isLogIn, setWaitingToSignIn, url } = useContext(AuthContext);
-    const [open, setOpen] = useState(isLogIn);
+    const [open, setOpen] = useState(false);
     const navigate = useNavigate();
-    const handleNavigate = () => funding == null ? setErr(true) : (currentUser == null ? (setErr(false), setWaitingToSignIn(true), navigate("/authentication/sign-in")) : handleOpen());
+    const handleNavigate = () => { funding == null ? setErr(true) : (currentUser == null ? (setErr(false), setWaitingToSignIn(true), navigate("/authentication/sign-in")) : handleOpen()) };
     const handleClose = () => setOpen(true);
     const [activeStep, setActiveStep] = useState(isLogIn ? 4 : 0);
     const [err, setErr] = useState(false);
@@ -52,9 +52,12 @@ function NewProject() {
     const [topologie, setTopologie] = useState(JSON.parse(localStorage.getItem("topologie")) || null);
     const [houseType, setHouseType] = useState(JSON.parse(localStorage.getItem("houseType")) || null);
     const [standingType, setStandingType] = useState(JSON.parse(localStorage.getItem("standingType")) || null);
-    const [nbrCars, setNbrCars] = useState(JSON.parse(localStorage.getItem("nbrCars")) || null);
+    const [nbrCars, setNbrCars] = useState(JSON.parse(localStorage.getItem("garage")) || null);
     const [nbrRooms, setNbrRooms] = useState(JSON.parse(localStorage.getItem("nbrRooms")) || 0);
     const [funding, setFunding] = useState(JSON.parse(localStorage.getItem("funding")) || null);
+    const [funList, setFunList] = useState([]);
+    const [constructionList, setConstructionList] = useState([]);
+    const [standingList, setStandingList] = useState([]);
     const [warningSB, setWarningSB] = useState(false);
     const closeWarningSB = () => setWarningSB(false);
 
@@ -140,7 +143,7 @@ function NewProject() {
     };
     const handleChangeCars = (event: SelectChangeEvent) => {
         let nbr = event.target.value;
-        localStorage.setItem("nbrCars", JSON.stringify(nbr));
+        localStorage.setItem("garage", JSON.stringify(nbr));
         setNbrCars(nbr);
     };
     const handleChangeTopologie = (event: SelectChangeEvent) => {
@@ -174,30 +177,67 @@ function NewProject() {
     };
 
     useEffect(() => {
-        fetch(`${url}/api/data/cities`)
-            .then((res) => res.json())
-            .then((data) => {
-                setVilles(data);
-            });
-        if (ville != null) {
-            fetch(`${url}/api/data/communes?villeId=${ville.id}`)
+        try {
+            fetch(`${url}/api/data/cities`)
                 .then((res) => res.json())
                 .then((data) => {
-                    setCommunes(data);
+                    setVilles(data);
+                })
+                .catch(error => {
+                    console.error(error);
                 });
+
+            if (ville != null) {
+                fetch(`${url}/api/data/communes?villeId=${ville.id}`)
+                    .then((res) => res.json())
+                    .then((data) => {
+                        setCommunes(data);
+                    });
+            }
+            if (commune != null) {
+                fetch(`${url}/api/data/quarters?communeId=${commune.id}`)
+                    .then((res) => res.json())
+                    .then((data) => {
+                        setQuarters(data);
+                    });
+                fetch(`${url}/api/data/zones?communeId=${commune.id}`)
+                    .then((res) => res.json())
+                    .then((data) => {
+                        setZones(data);
+                    });
+            }
+
+            fetch(`${url}/api/data/getFinancement`)
+                .then((res) => res.json())
+                .then((data) => {
+                    setFunList(data);
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+
+            fetch(`${url}/api/data/getTypesDeConstruction`)
+                .then((res) => res.json())
+                .then((data) => {
+                    setConstructionList(data);
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+
+            fetch(`${url}/api/data/getStanding`)
+                .then((res) => res.json())
+                .then((data) => {
+                    setStandingList(data);
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+        } catch (e) {
+            console.log(e);
         }
-        if (commune != null) {
-            fetch(`${url}/api/data/quarters?communeId=${commune.id}`)
-                .then((res) => res.json())
-                .then((data) => {
-                    setQuarters(data);
-                });
-            fetch(`${url}/api/data/zones?communeId=${commune.id}`)
-                .then((res) => res.json())
-                .then((data) => {
-                    setZones(data);
-                });
-        }
+        if (currentUser != null && isLogIn == true)
+            handleOpen();
     }, []);
 
     const renderWarningSB = (
@@ -450,9 +490,10 @@ function NewProject() {
                                                                 onChange={handleChangeTypeHouse}
                                                                 label="Type de maison *"
                                                             >
-                                                                <MenuItem value="Maison">Maison</MenuItem>
-                                                                <MenuItem value="Duplex">Duplex</MenuItem>
-                                                                <MenuItem value="Triplex">Triplex</MenuItem>
+                                                                {constructionList.map((construction) => (
+                                                                    <MenuItem key={construction.TYP} value={construction.TYP}>{construction.LABEL}</MenuItem>
+                                                                ))
+                                                                }
                                                             </Select>
                                                         </FormControl>
                                                     </Grid>
@@ -464,10 +505,10 @@ function NewProject() {
                                                                 onChange={handleChangeStanding}
                                                                 label="Type de standing *"
                                                             >
-                                                                <MenuItem value="Social">Social</MenuItem>
-                                                                <MenuItem value="Economique">Economique</MenuItem>
-                                                                <MenuItem value="Moyen standing">Moyen standing</MenuItem>
-                                                                <MenuItem value="Haut standing">Haut standing</MenuItem>
+                                                                {standingList.map((stand) => (
+                                                                    <MenuItem key={stand.STAND} value={stand.STAND}>{stand.LABEL}</MenuItem>
+                                                                ))
+                                                                }
                                                             </Select>
                                                         </FormControl>
                                                     </Grid>
@@ -520,10 +561,10 @@ function NewProject() {
                                                         onChange={handleChangeFund}
                                                         label="Financement *"
                                                     >
-                                                        <MenuItem value="Epargne personnelle">Epargne personnelle</MenuItem>
-                                                        <MenuItem value="Prêt bancaire">Pr&ecirc;t bancaire</MenuItem>
-                                                        <MenuItem value="Autre">Autre</MenuItem>
-                                                        <MenuItem value="Je ne sais pas">Je ne sais pas</MenuItem>
+                                                        {funList.map((fund) => (
+                                                            <MenuItem key={fund.FIN} value={fund.FIN}>{fund.LABEL}</MenuItem>
+                                                        ))
+                                                        }
                                                     </Select>
                                                 </FormControl>
                                             </MDBox>

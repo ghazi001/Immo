@@ -9,14 +9,12 @@ export const AuthContextProvider = ({ children }) => {
   const [waitnigToSignIn, setWaitingToSignIn] = useState(false);
   const [isLogIn, setIsLogIn] = useState(false);
   const navigate = useNavigate();
-    const url = "http://188.165.231.114:8800";
+    const url = "http://188.165.231.114:8880";
 
-  const login = async (inputs) => {
-    const res = await axios.post(`${url}/api/auth/login`, inputs, {
-      withCredentials: true,
-    });
+    const login = async (inputs) => {
+            const res = await axios.post(`${url}/api/auth/login`, inputs);
 
-    setCurrentUser(res.data);
+            setCurrentUser(res.data);
   };
 
     const updateInfo = async (inputs) => {
@@ -29,11 +27,11 @@ export const AuthContextProvider = ({ children }) => {
   };
 
   const logout = async () => {
-      await axios.post(`${url}/api/auth/logout`, {
-      withCredentials: true,
-    });
+      await axios.post(`${url}/api/auth/logout`);
 
       setCurrentUser(null);
+      setIsLogIn(false);
+      setWaitingToSignIn(false);
       navigate("/");
   };
     useEffect(() => {

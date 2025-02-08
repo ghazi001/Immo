@@ -53,7 +53,7 @@ function Projects() {
         localStorage.setItem("date", JSON.stringify(date));
         localStorage.setItem("houseType", JSON.stringify(project.typeMaison));
         localStorage.setItem("standingType", JSON.stringify(project.typeStanding));
-        localStorage.setItem("nbrCars", JSON.stringify(project.garage));
+        localStorage.setItem("garage", JSON.stringify(project.garage));
         localStorage.setItem("nbrRooms", JSON.stringify(project.nbrPiece));
         localStorage.setItem("surface", JSON.stringify(project.surface));
         localStorage.setItem("topologie", JSON.stringify(project.topologie));

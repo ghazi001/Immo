@@ -20,7 +20,7 @@ export function Initialize() {
     localStorage.setItem("date", JSON.stringify(null));
     localStorage.setItem("houseType", JSON.stringify(null));
     localStorage.setItem("standingType", JSON.stringify(null));
-    localStorage.setItem("nbrCars", JSON.stringify(null));
+    localStorage.setItem("garage", JSON.stringify(null));
     localStorage.setItem("nbrRooms", JSON.stringify(0));
     localStorage.setItem("surface", JSON.stringify(0));
     localStorage.setItem("topologie", JSON.stringify(null));

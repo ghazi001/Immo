@@ -83,10 +83,33 @@ function ShowEstimate({ project, setOpen, setWarningSB }) {
     const [loadingCorps, setLoadingCorps] = useState(true);
     const [corps, setCorps] = useState(null);
     const [nombre, setNombre] = useState(0);
+    const [nombrePiece, setNombrePiece] = useState(project.nbrRooms);
+    const [piecesList, setPiecesList] = useState(null);
     const [surface, setSurface] = useState(0);
     const [piece, setPiece] = useState("");
+    const [pieceLabel, setPieceLabel] = useState("");
     const [listPerso, setListPers] = useState([]);
+    const [constructionList, setConstructionList] = useState([]);
+    const [standingList, setStandingList] = useState([]);
+    const CalculatedPieces = ["SEJ","SAM","CH1","CH2","BUR"];
 
+    const [inputs, setInputs] = useState({
+        houseType: project.houseType,
+        standingType: project.standingType,
+        garage: project.garage,
+        terrain: project.surface,
+    });
+
+    const handleChange = (e) => {
+        setInputs((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+        localStorage.setItem(e.target.name, JSON.stringify(e.target.value));
+        switch (e.target.name) {
+            case "houseType": project.houseType = e.target.value; break;
+            case "standingType": project.standingType = e.target.value; break;
+            case "garage": project.garage = e.target.value; break;
+        }
+
+    };
 
     const handleSave = async () => {
         if (project.id != undefined) {
@@ -139,6 +162,7 @@ function ShowEstimate({ project, setOpen, setWarningSB }) {
             const newPerso = {
                 id: 0,
                 piece: piece,
+                pieceLabel: pieceLabel,
                 surface: surface,
                 nombre: nombre,
             };
@@ -146,23 +170,25 @@ function ShowEstimate({ project, setOpen, setWarningSB }) {
             var list = listPerso;
             list.push(newPerso);
             setListPers(list);
+            if (CalculatedPieces.includes(piece)) {
+                setNombrePiece(parseInt(nombrePiece) + parseInt( nombre));
+                project.nbrRooms = parseInt(nombrePiece) + parseInt(nombre);
+            }
             setSurface(0);
             setNombre(0);
             setPiece("");
+            setPieceLabel("");
         } else {
             setWarningSB(true);
         }
     };
 
     const handleSavePerso = async () => {
-        var stand = "MST";
-        var TYP = "DUX";
-        var nbr = 3;
-        var list = listPerso;
-        project.nbrRooms = list.reduce((total, currentValue) => total = parseInt(total) + parseInt(currentValue.nombre), 0);
-        project.surface = list.reduce((total, currentValue) => total = parseFloat(total) + parseFloat(parseInt(currentValue.nombre) * parseFloat(currentValue.surface)), 0);
+        var stand = project.standingType;
+        var TYP = project.houseType;
+        var nbr = project.nbrRooms;
         try {
-            fetch(`http://188.165.231.114:8060/immo/backend/estimationBudget?TYP=${TYP}&STAND=${stand}&NBPCS=${nbr}`)
+            fetch(`${url}/api/projects/estimationBudget?TYP=${TYP}&STAND=${stand}&NBPCS=${nbr}`)
                 .then((res) => res.json())
                 .then((data) => {
                     setBudget(data[0]);
@@ -173,7 +199,7 @@ function ShowEstimate({ project, setOpen, setWarningSB }) {
             setLoadingBudget(false);
         }
         try {
-            fetch(`http://188.165.231.114:8060/immo/backend/detailCorpEtat?TYP=${TYP}&STAND=${stand}&NBPCS=${nbr}`)
+            fetch(`${url}/api/projects/detailCorpEtat?TYP=${TYP}&STAND=${stand}&NBPCS=${nbr}`)
                 .then((res) => res.json())
                 .then((data) => {
                     setCorps(data);
@@ -190,14 +216,19 @@ function ShowEstimate({ project, setOpen, setWarningSB }) {
 
     const handleRemovePerso = async (indice) => {
         var list = listPerso;
+        if (CalculatedPieces.includes(list[indice].piece))
+        {
+            setNombrePiece(parseInt(nombrePiece) - parseInt(list[indice].nombre));
+            project.nbrRooms = parseInt(nombrePiece) - parseInt(list[indice].nombre);
+        }
         list = list.filter((perso, index) => index != indice);
         setListPers(list);
     };
 
     useEffect(() => {
-        var stand = "MST";
-        var TYP = "DUX";
-        var nbr = 3;
+        var stand = project.standingType;
+        var TYP = project.houseType;
+        var nbr = project.nbrRooms;
         if (project.id != undefined) {
             fetch(`${url}/api/projects/getPerso?projectId=${project.id}`)
                 .then((res) => res.json())
@@ -205,8 +236,26 @@ function ShowEstimate({ project, setOpen, setWarningSB }) {
                     setListPers(data);
                 });
         }
+        else {
+            fetch(`${url}/api/projects/getInitPerso?NBPCS=${nbr}&STAND=${stand}`)
+                .then((res) => res.json())
+                .then((data) => {
+                    var persoList = [];
+                    data.map((perso) => {
+                        const newPerso = {
+                            id: 0,
+                            piece: perso.PIECE,
+                            pieceLabel: perso.LABEL,
+                            surface: perso.SMOY,
+                            nombre: perso.NBRE,
+                        };
+                        persoList.push(newPerso)
+                    });
+                    setListPers(persoList);
+                });
+        }
         try {
-            fetch(`http://188.165.231.114:8060/immo/backend/estimationBudget?TYP=${TYP}&STAND=${stand}&NBPCS=${nbr}`)
+            fetch(`${url}/api/projects/estimationBudgetNEW?TYP=${TYP}&STAND=${stand}&NBPCS=${nbr}`)
                 .then((res) => res.json())
                 .then((data) => {
                     setBudget(data[0]);
@@ -217,7 +266,33 @@ function ShowEstimate({ project, setOpen, setWarningSB }) {
             setLoadingBudget(false);
         }
         try {
-            fetch(`http://188.165.231.114:8060/immo/backend/detailCorpEtat?TYP=${TYP}&STAND=${stand}&NBPCS=${nbr}`)
+            fetch(`${url}/api/data/getTypeDePieces`)
+                .then((res) => res.json())
+                .then((data) => {
+                    setPiecesList(data);
+                });
+            fetch(`${url}/api/data/getTypesDeConstruction`)
+                .then((res) => res.json())
+                .then((data) => {
+                    setConstructionList(data);
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+
+            fetch(`${url}/api/data/getStanding`)
+                .then((res) => res.json())
+                .then((data) => {
+                    setStandingList(data);
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+        } catch (Exception) {
+            setPiecesList(null);
+        }
+        try {
+            fetch(`${url}/api/projects/detailCorpEtat?TYP=${TYP}&STAND=${stand}&NBPCS=${nbr}`)
                 .then((res) => res.json())
                 .then((data) => {
                     setCorps(data);
@@ -237,10 +312,76 @@ function ShowEstimate({ project, setOpen, setWarningSB }) {
             aria-labelledby="modal-modal-title"
             aria-describedby="modal-modal-description"
         >
-            <ScrolingCard xs={12} md={12} xl={12} >
+            <ScrolingCard sx={{ width: "50%" }} >
                 <MDBox>
-                    <Typography id="modal-modal-title" variant="h6" component="h2">
+                    <Typography id="modal-modal-title" variant="h5" component="h2" mb={2}>
                         Personnalisation
+                    </Typography>
+                    <Typography id="modal-modal-title" variant="h6" component="h2" fontSize={13}>
+                        Souhaitez vous modifier le type, le standing ou le type de garage
+                    </Typography>
+                    <Grid container mt={2}>
+                        <Grid item xs={6} md={3} xl={3} pr={3} mb={2}>
+                            <FormControl required sx={{ minWidth: "100%" }}>
+                                <InputLabel pl={3}>Type de maison </InputLabel>
+                                <Select sx={{ height: 44 }}
+                                    name="houseType"
+                                    value={inputs.houseType}
+                                    onChange={handleChange}
+                                    label="Type de maison *"
+                                >
+                                    {constructionList.map((construction) => (
+                                        <MenuItem key={construction.TYP} value={construction.TYP}>{construction.LABEL}</MenuItem>
+                                    ))
+                                    }
+                                </Select>
+                            </FormControl>
+                        </Grid>
+                        <Grid item xs={6} md={3} xl={3} pr={3} mb={2}>
+                            <FormControl required sx={{ minWidth: "100%" }}>
+                                <InputLabel pb={3}>Type de standing </InputLabel>
+                                <Select sx={{ height: 44 }}
+                                    name="standingType"
+                                    value={inputs.standingType}
+                                    onChange={handleChange}
+                                    label="Type de standing *"
+                                >
+                                    {standingList.map((stand) => (
+                                        <MenuItem key={stand.STAND} value={stand.STAND}>{stand.LABEL}</MenuItem>
+                                    ))
+                                    }
+                                </Select>
+                            </FormControl>
+                        </Grid>
+                        <Grid item xs={6} md={3} xl={3} pr={3} mb={2}>
+                            <FormControl required sx={{ minWidth: "100%" }}>
+                                <InputLabel pb={3}>Garage </InputLabel>
+                                <Select sx={{ height: 44 }}
+                                    name="garage"
+                                    value={inputs.garage}
+                                    onChange={handleChange}
+                                    label="Garage *"
+                                >
+                                    <MenuItem value="">
+                                        <em>Aucune</em>
+                                    </MenuItem>
+                                    <MenuItem value="1 voiture">1 voiture</MenuItem>
+                                    <MenuItem value="2 voitures">2 voitures</MenuItem>
+                                </Select>
+                            </FormControl>
+                        </Grid>
+                        <Grid item xs={6} md={3} xl={3} pr={3} mb={2}>
+                            <MDInput
+                                name="nombre"
+                                type="text"
+                                value={nombrePiece}
+                                label="Nombre de pi&egrave;ces"
+                                disabled={true}
+                            />
+                        </Grid>
+                    </Grid>
+                    <Typography id="modal-modal-title" variant="h6" component="h2" fontSize={13}>
+                        Souhaitez vous ajouter ou retirer des pi&egrave;ces
                     </Typography>
                     <Grid container mt={2}>
                         <Grid item xs={6} md={4} xl={4} pr={3} mb={2}>
@@ -248,13 +389,15 @@ function ShowEstimate({ project, setOpen, setWarningSB }) {
                                 <InputLabel pl={3}>Pi&eacute;ce</InputLabel>
                                 <Select sx={{ height: 44 }}
                                     value={piece}
-                                    onChange={(e) => setPiece(e.target.value)}
+                                    name={pieceLabel}
+                                    onChange={(e, p) => {
+                                        setPiece(e.target.value); setPieceLabel(p.props.name)
+                                    }}
                                     label="Piece"
                                 >
-                                    <MenuItem value="Salon">Salon</MenuItem>
-                                    <MenuItem value="Chambre">Chambre</MenuItem>
-                                    <MenuItem value="Cuisine">Cuisine</MenuItem>
-                                    <MenuItem value="Salle de bain">Salle de bain</MenuItem>
+                                    {piecesList && piecesList.map((item) => (
+                                        < MenuItem key={item.TYP} name={item.LABEL} value={item.TYP} > {item.LABEL} </MenuItem>
+                                    ))}
                                 </Select>
                             </FormControl>
                         </Grid>
@@ -298,47 +441,23 @@ function ShowEstimate({ project, setOpen, setWarningSB }) {
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-
-                                {listPerso.length != 0 ?
-                                    (
-                                        <>
-                                            {listPerso.map((perso, indice) => (
-                                                <StyledTableRow key={indice}>
-                                                    <TableCell align="left">{perso.piece}</TableCell>
-                                                    <TableCell align="left">{perso.surface}</TableCell>
-                                                    <TableCell align="left">{perso.nombre}</TableCell>
-                                                    <TableCell align="center">
-                                                        <MDButton variant="gradient" size="small" sx={{ margin: "0 2px" }} color="error" onClick={() => { handleRemovePerso(indice) }} iconOnly>
-                                                            <Icon>delete</Icon>
-                                                        </MDButton>
-                                                    </TableCell>
-                                                </StyledTableRow>
-                                            ))}
-                                        </>
-                                    ) : (
-                                        <>
-
-                                            <StyledTableRow >
-                                                <TableBodyCell align="left"></TableBodyCell>
-                                                <TableBodyCell align="left"></TableBodyCell>
-                                                <TableBodyCell align="left"></TableBodyCell>
-                                                <TableBodyCell align="left"></TableBodyCell>
-                                            </StyledTableRow>
-                                            <StyledTableRow >
-                                                <TableBodyCell align="left"></TableBodyCell>
-                                                <TableBodyCell align="left"></TableBodyCell>
-                                                <TableBodyCell align="left"></TableBodyCell>
-                                                <TableBodyCell align="left"></TableBodyCell>
-                                            </StyledTableRow>
-                                        </>
-
-                                    )}
-
+                                {listPerso.map((perso, indice) => (
+                                    <StyledTableRow key={indice}>
+                                        <TableCell align="left">{perso.pieceLabel}</TableCell>
+                                        <TableCell align="left">{perso.surface}</TableCell>
+                                        <TableCell align="left">{perso.nombre}</TableCell>
+                                        <TableCell align="center">
+                                            <MDButton variant="gradient" size="small" sx={{ margin: "0 2px" }} color="error" onClick={() => { handleRemovePerso(indice) }} iconOnly>
+                                                <Icon>delete</Icon>
+                                            </MDButton>
+                                        </TableCell>
+                                    </StyledTableRow>
+                                ))}
                             </TableBody>
                         </Table>
                     </TableContainer>
                 </MDBox>
-                <MDBox sx={{ display: "flex", flexDirection: "row", pt: 2, justifyContent: "center" }} mt={2}>
+                <MDBox sx={{ display: "flex", flexDirection: "row", pt: 2, justifyContent: "center" }} my={2}>
                     <MDButton variant="gradient" size="small" sx={{ margin: "0 2px" }} color="error" onClick={handleClosePerso} >
                         Annuler
                     </MDButton>
@@ -346,6 +465,7 @@ function ShowEstimate({ project, setOpen, setWarningSB }) {
                         Enregistrer
                     </MDButton>
                 </MDBox>
+
             </ScrolingCard>
         </Modal >
     );
