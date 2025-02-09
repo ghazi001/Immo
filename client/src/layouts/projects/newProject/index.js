@@ -27,6 +27,7 @@ import dayjs from "dayjs";
 import ShowEstimate from "../showEstimate";
 import MDSnackbar from "../../../components/MDSnackbar";
 const steps = ["Localisation", "Titre", "Description", "Type", "Financement"];
+import axios from "axios";
 
 
 function NewProject() {
@@ -46,6 +47,7 @@ function NewProject() {
     const [zones, setZones] = useState(null);
     const [quarter, setQuarter] = useState(JSON.parse(localStorage.getItem("quarter")) || null);
     const [quarters, setQuarters] = useState(null);
+    const [projectId, setProjectId] = useState(JSON.parse(localStorage.getItem("projectId")) || null);
     const [titre, setTitre] = useState(JSON.parse(localStorage.getItem("titre")) || null);
     const [date, setDate] = useState(JSON.parse(localStorage.getItem("date")) || null);
     const [surface, setSurface] = useState(JSON.parse(localStorage.getItem("surface")) || null);
@@ -58,8 +60,12 @@ function NewProject() {
     const [funList, setFunList] = useState([]);
     const [constructionList, setConstructionList] = useState([]);
     const [standingList, setStandingList] = useState([]);
+    const [topologieList, setTopologieList] = useState([]);
+    const [titleList, setTitleList] = useState([]);
+    const [garageList, setGarageList] = useState([]);
     const [warningSB, setWarningSB] = useState(false);
     const closeWarningSB = () => setWarningSB(false);
+    const [errMessage, setErrMessage] = useState("");
 
 
     const handleChangeVille = (event: SelectChangeEvent) => {
@@ -94,15 +100,24 @@ function NewProject() {
             .then((data) => {
                 setQuarters(data);
             });
-        fetch(`${url}/api/data/zones?communeId=${commune.id}`)
+    };
+
+    const handleChangeQuarter = (event: SelectChangeEvent) => {
+        let quarter = event.target.value;
+        localStorage.setItem("quarter", JSON.stringify(quarter));
+        localStorage.setItem("zone", JSON.stringify(null));
+        setQuarter(quarter);
+        setZone(null);
+        fetch(`${url}/api/data/zones?quartier=${quarter.id}`)
             .then((res) => res.json())
             .then((data) => {
                 setZones(data);
             });
     };
 
-    const handleOpen = () => {
+    const handleOpen = async () => {
         const project = {
+            id: projectId,
             ville: ville,
             commune: commune,
             quarter: quarter,
@@ -117,15 +132,60 @@ function NewProject() {
             topologie: topologie,
             funding: funding,
         };
+
+        var stand = project.standingType;
+        var nbr = project.nbrRooms;
+        if (project.id == null) {
+            const newProject = {
+                villeId: project.ville.id,
+                communeId: project.commune.id,
+                quartierId: project.quarter.id,
+                zoneId: project.zone.id,
+                titre: project.titre,
+                dateTitre: project.date,
+                typeMaison: project.houseType,
+                typeStanding: project.standingType,
+                garage: project.garage,
+                nbrPiece: project.nbrRooms,
+                surface: project.surface,
+                topologie: project.topologie,
+                financement: project.funding,
+                userId: currentUser.id,
+            };
+            try {
+                let result = await axios.post(`${url}/api/projects/addProject`, newProject);
+                if (result.status == 200) {
+                    let id = result.data;
+                    project.id = id;
+                    setProjectId(id);
+                    localStorage.setItem("projectId", JSON.stringify(id));
+                    fetch(`${url}/api/projects/getInitPerso?NBPCS=${nbr}&STAND=${stand}`)
+                        .then((res) => res.json())
+                        .then(async (data) => {
+                            var persoList = [];
+                            data.map((perso) => {
+                                const newPerso = {
+                                    id: 0,
+                                    piece: perso.PIECE,
+                                    pieceLabel: perso.LABEL,
+                                    surface: perso.SMOY,
+                                    nombre: perso.NBRE,
+                                };
+                                persoList.push(newPerso)
+                            });
+                            await axios.post(`${url}/api/projects/addPerso?projectId=${id}`, persoList);
+                        });
+                }
+            } catch (err) {
+                setErrMessage(err.response == undefined ? "Probl\u00e9me de connexion au BD" : err.response.data);
+            }
+        }
+
         setPorject(project);
         setOpen(true);
     };
 
-    const handleChangeQuarter = (event: SelectChangeEvent) => {
-        let quarter = event.target.value;
-        localStorage.setItem("quarter", JSON.stringify(quarter));
-        setQuarter(quarter);
-    };
+
     const handleChangeTitre = (event: SelectChangeEvent) => {
         let titre = event.target.value;
         localStorage.setItem("titre", JSON.stringify(titre));
@@ -200,7 +260,10 @@ function NewProject() {
                     .then((data) => {
                         setQuarters(data);
                     });
-                fetch(`${url}/api/data/zones?communeId=${commune.id}`)
+               
+            }
+            if (quarter != null) {
+                fetch(`${url}/api/data/zones?quartier=${quarter.id}`)
                     .then((res) => res.json())
                     .then((data) => {
                         setZones(data);
@@ -233,6 +296,34 @@ function NewProject() {
                 .catch(error => {
                     console.error(error);
                 });
+
+            fetch(`${url}/api/data/getNombreDeGarages`)
+                .then((res) => res.json())
+                .then((data) => {
+                    setGarageList(data);
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+
+            fetch(`${url}/api/data/getListDesTopologies`)
+                .then((res) => res.json())
+                .then((data) => {
+                    setTopologieList(data);
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+
+            fetch(`${url}/api/data/getListDesTitres`)
+                .then((res) => res.json())
+                .then((data) => {
+                    setTitleList(data);
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+
         } catch (e) {
             console.log(e);
         }
@@ -335,26 +426,6 @@ function NewProject() {
                                                     </Grid>
                                                     <Grid item xs={12} md={6} xl={6}>
                                                         <FormControl required sx={{ mx: "10%", minWidth: "80%" }}>
-                                                            <InputLabel pb={3}>Zone</InputLabel>
-                                                            {zones &&
-                                                                <Select sx={{ height: 44 }}
-                                                                    value={zone != null ? zones?.find(x => x.id == zone?.id) : null}
-                                                                    onChange={(e) => {
-                                                                        setZone(e.target.value);
-                                                                        localStorage.setItem("zone", JSON.stringify(e.target.value));
-                                                                    }} label="Zone *">
-                                                                    {zones &&
-                                                                        zones.map((item) => (
-                                                                            <MenuItem key={item.id} value={item}>
-                                                                                {item.zone}
-                                                                            </MenuItem>
-                                                                        ))}
-                                                                </Select>
-                                                            }
-                                                        </FormControl>
-                                                    </Grid>
-                                                    <Grid item xs={12} md={6} xl={6}>
-                                                        <FormControl required sx={{ mx: "10%", minWidth: "80%" }}>
                                                             <InputLabel pl={3}>Quarter</InputLabel>
                                                             {quarters &&
                                                                 <Select sx={{ height: 44 }}
@@ -372,6 +443,26 @@ function NewProject() {
                                                             }
                                                         </FormControl>
                                                     </Grid>
+                                                    <Grid item xs={12} md={6} xl={6}>
+                                                        <FormControl required sx={{ mx: "10%", minWidth: "80%" }}>
+                                                            <InputLabel pb={3}>Zone</InputLabel>
+                                                            {zones &&
+                                                                <Select sx={{ height: 44 }}
+                                                                    value={zone != null ? zones?.find(x => x.id == zone?.id) : null}
+                                                                    onChange={(e) => {
+                                                                        setZone(e.target.value);
+                                                                        localStorage.setItem("zone", JSON.stringify(e.target.value));
+                                                                    }} label="Zone *">
+                                                                    {zones &&
+                                                                        zones.map((item) => (
+                                                                            <MenuItem key={item.id} value={item}>
+                                                                                {item.zone}
+                                                                            </MenuItem>
+                                                                        ))}
+                                                                </Select>
+                                                            }
+                                                        </FormControl>
+                                                    </Grid>                                        
                                                 </Grid>
                                             </MDBox>
                                         </Card>
@@ -393,15 +484,10 @@ function NewProject() {
                                                                 onChange={handleChangeTitre}
                                                                 label="Titre propriété *"
                                                             >
-                                                                <MenuItem value={null}>
-                                                                    <em>Aucun</em>
-                                                                </MenuItem>
-                                                                <MenuItem value="Attestation villageoise">
-                                                                    Attestation villageoise
-                                                                </MenuItem>
-                                                                <MenuItem value="Lettre">Lettre</MenuItem>
-                                                                <MenuItem value="ACP">ACP</MenuItem>
-                                                                <MenuItem value="ADP">ADP</MenuItem>
+                                                                {titleList.map((title) => (
+                                                                    <MenuItem key={title.id} value={title.id}>{title.Description}</MenuItem>
+                                                                ))
+                                                                }
                                                             </Select>
                                                         </FormControl>
                                                     </Grid>
@@ -458,13 +544,10 @@ function NewProject() {
                                                                     onChange={handleChangeTopologie}
                                                                     label="Topologie *"
                                                                 >
-                                                                    <MenuItem value="Plat">Plat</MenuItem>
-                                                                    <MenuItem value="Peu accidenté">Peu accident&eacute;</MenuItem>
-                                                                    <MenuItem value="accidenté">Accident&eacute;</MenuItem>
-                                                                    <MenuItem value="très accidenté">
-                                                                        Tr&eacute;s accident&eacute;
-                                                                    </MenuItem>
-                                                                    <MenuItem value="ADP">ADP</MenuItem>
+                                                                    {topologieList.map((topologie) => (
+                                                                        <MenuItem key={topologie.id} value={topologie.Description}>{topologie.Description}</MenuItem>
+                                                                    ))
+                                                                    }
                                                                 </Select>
                                                             </FormControl>
                                                         </MDBox>
@@ -520,11 +603,10 @@ function NewProject() {
                                                                 onChange={handleChangeCars}
                                                                 label="Garage *"
                                                             >
-                                                                <MenuItem value="">
-                                                                    <em>Aucune</em>
-                                                                </MenuItem>
-                                                                <MenuItem value="1 voiture">1 voiture</MenuItem>
-                                                                <MenuItem value="2 voitures">2 voitures</MenuItem>
+                                                                {garageList.map((garage) => (
+                                                                    <MenuItem key={garage.id} value={garage.Description}>{garage.Description}</MenuItem>
+                                                                ))
+                                                                }
                                                             </Select>
                                                         </FormControl>
                                                     </Grid>

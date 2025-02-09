@@ -45,6 +45,7 @@ function Projects() {
         var zone = { id: project.zoneId, zone: project.zone }
         var quartier = { id: project.quartierId, quartier: project.quartier }
         var date = dayjs(project.dateTitre).format("YYYY-MM-DD");
+        localStorage.setItem("projectId", JSON.stringify(project.id));
         localStorage.setItem("ville", JSON.stringify(ville));
         localStorage.setItem("commune", JSON.stringify(commune));
         localStorage.setItem("quarter", JSON.stringify(quartier));
@@ -101,12 +102,13 @@ function Projects() {
     useEffect(() => {
         if (!currentUser)
             navigate("/nouveau-projet")
-        else
+        else {
             fetch(`${url}/api/projects/list?userId=${currentUser.id}`)
-                .then((res) => res.json())
-                .then((data) => {
-                    setProjects(data);
-                });
+            .then((res) => res.json())
+            .then((data) => {
+                setProjects(data);
+            });
+        }
     }, []);
 
     const renderWarningSB = (

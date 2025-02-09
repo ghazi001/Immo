@@ -255,7 +255,7 @@ function ShowEstimate({ project, setOpen, setWarningSB }) {
                 });
         }
         try {
-            fetch(`${url}/api/projects/estimationBudgetNEW?TYP=${TYP}&STAND=${stand}&NBPCS=${nbr}`)
+            fetch(`${url}/api/projects/estimationBudgetNew?TYP=${TYP}&STAND=${stand}&NBPCS=${nbr}`)
                 .then((res) => res.json())
                 .then((data) => {
                     setBudget(data[0]);
@@ -265,6 +265,18 @@ function ShowEstimate({ project, setOpen, setWarningSB }) {
             setBudget(null);
             setLoadingBudget(false);
         }
+        try {
+            fetch(`${url}/api/projects/detailCorpEtat?TYP=${TYP}&STAND=${stand}&NBPCS=${nbr}`)
+                .then((res) => res.json())
+                .then((data) => {
+                    setCorps(data);
+                    setLoadingCorps(false);
+                });
+        } catch (Exception) {
+            setCorps(null);
+            setLoadingCorps(false);
+        }
+
         try {
             fetch(`${url}/api/data/getTypeDePieces`)
                 .then((res) => res.json())
@@ -291,17 +303,7 @@ function ShowEstimate({ project, setOpen, setWarningSB }) {
         } catch (Exception) {
             setPiecesList(null);
         }
-        try {
-            fetch(`${url}/api/projects/detailCorpEtat?TYP=${TYP}&STAND=${stand}&NBPCS=${nbr}`)
-                .then((res) => res.json())
-                .then((data) => {
-                    setCorps(data);
-                    setLoadingCorps(false);
-                });
-        } catch (Exception) {
-            setCorps(null);
-            setLoadingCorps(false);
-        }
+
     }, [])
 
 

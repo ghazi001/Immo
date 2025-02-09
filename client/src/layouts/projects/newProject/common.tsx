@@ -12,6 +12,7 @@ export default interface Perso {
 }
 
 export function Initialize() {
+    localStorage.setItem("projectId", JSON.stringify(null));
     localStorage.setItem("ville", JSON.stringify(null));
     localStorage.setItem("commune", JSON.stringify(null));
     localStorage.setItem("quarter", JSON.stringify(null));
