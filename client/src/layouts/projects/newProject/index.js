@@ -47,7 +47,7 @@ function NewProject() {
     const [zones, setZones] = useState(null);
     const [quarter, setQuarter] = useState(JSON.parse(localStorage.getItem("quarter")) || null);
     const [quarters, setQuarters] = useState(null);
-    const [projectId, setProjectId] = useState(JSON.parse(localStorage.getItem("projectId")) || null);
+    const [projectId, setProjectId] = useState(null);
     const [titre, setTitre] = useState(JSON.parse(localStorage.getItem("titre")) || null);
     const [date, setDate] = useState(JSON.parse(localStorage.getItem("date")) || null);
     const [surface, setSurface] = useState(JSON.parse(localStorage.getItem("surface")) || null);
@@ -158,7 +158,6 @@ function NewProject() {
                     let id = result.data;
                     project.id = id;
                     setProjectId(id);
-                    localStorage.setItem("projectId", JSON.stringify(id));
                     fetch(`${url}/api/projects/getInitPerso?NBPCS=${nbr}&STAND=${stand}`)
                         .then((res) => res.json())
                         .then(async (data) => {
@@ -173,16 +172,21 @@ function NewProject() {
                                 };
                                 persoList.push(newPerso)
                             });
-                            await axios.post(`${url}/api/projects/addPerso?projectId=${id}`, persoList);
+                            await axios.post(`${url}/api/projects/addPerso?projectId=${id}`, persoList).then(() => {
+                                setPorject(project);
+                                setOpen(true);
+                            });
                         });
                 }
             } catch (err) {
                 setErrMessage(err.response == undefined ? "Probl\u00e9me de connexion au BD" : err.response.data);
             }
         }
-
-        setPorject(project);
-        setOpen(true);
+        else
+        {
+            setPorject(project);
+            setOpen(true);
+        }
     };
 
 
@@ -260,7 +264,7 @@ function NewProject() {
                     .then((data) => {
                         setQuarters(data);
                     });
-               
+
             }
             if (quarter != null) {
                 fetch(`${url}/api/data/zones?quartier=${quarter.id}`)
@@ -462,7 +466,7 @@ function NewProject() {
                                                                 </Select>
                                                             }
                                                         </FormControl>
-                                                    </Grid>                                        
+                                                    </Grid>
                                                 </Grid>
                                             </MDBox>
                                         </Card>

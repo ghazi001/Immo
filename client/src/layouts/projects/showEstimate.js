@@ -116,6 +116,7 @@ function ShowEstimate({ project, setOpen, setWarningSB }) {
             var list = listPerso;
             try {
                 await axios.post(`${url}/api/projects/addPerso?projectId=${project.id}`, list);
+                Initialize();
                 setOpen(false);
                 navigate("/mes-projets")
             } catch (err) {
