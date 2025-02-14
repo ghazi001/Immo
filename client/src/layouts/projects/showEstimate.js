@@ -75,7 +75,7 @@ function ShowEstimate({ project, setOpen, setWarningSB }) {
     const navigate = useNavigate();
     const handleClose = () => setOpen(false);
     const handleOpen = () => setOpenPerso(true);
-    const handleClosePerso = () => setOpenPerso(false);
+    const handleClosePerso = () => handleChangePerso();
     const [openPerso, setOpenPerso] = useState(false);
     const [errMessage, setErrMessage] = useState("");
     const [budget, setBudget] = useState(null);
@@ -179,12 +179,18 @@ function ShowEstimate({ project, setOpen, setWarningSB }) {
             setNombre(0);
             setPiece("");
             setPieceLabel("");
+            if (project.id != undefined) {
+                try {
+                    await axios.post(`${url}/api/projects/addPerso?projectId=${project.id}`, list);
+                } catch (err) {
+                }
+            }
         } else {
             setWarningSB(true);
         }
     };
 
-    const handleSavePerso = async () => {
+    const handleChangePerso = async () => {
         var stand = project.standingType;
         var TYP = project.houseType;
         var nbr = project.nbrRooms;
@@ -224,6 +230,12 @@ function ShowEstimate({ project, setOpen, setWarningSB }) {
         }
         list = list.filter((perso, index) => index != indice);
         setListPers(list);
+        if (project.id != undefined) {
+            try {
+                await axios.post(`${url}/api/projects/addPerso?projectId=${project.id}`, list);
+            } catch (err) {
+            }
+        }
     };
 
     useEffect(() => {
@@ -460,14 +472,14 @@ function ShowEstimate({ project, setOpen, setWarningSB }) {
                         </Table>
                     </TableContainer>
                 </MDBox>
-                <MDBox sx={{ display: "flex", flexDirection: "row", pt: 2, justifyContent: "center" }} my={2}>
-                    <MDButton variant="gradient" size="small" sx={{ margin: "0 2px" }} color="error" onClick={handleClosePerso} >
-                        Annuler
-                    </MDButton>
-                    <MDButton variant="gradient" size="small" sx={{ margin: "0 2px" }} color="success" onClick={handleSavePerso} >
-                        Enregistrer
-                    </MDButton>
-                </MDBox>
+                {/*<MDBox sx={{ display: "flex", flexDirection: "row", pt: 2, justifyContent: "center" }} my={2}>*/}
+                {/*    <MDButton variant="gradient" size="small" sx={{ margin: "0 2px" }} color="error" onClick={handleClosePerso} >*/}
+                {/*        Annuler*/}
+                {/*    </MDButton>*/}
+                {/*    <MDButton variant="gradient" size="small" sx={{ margin: "0 2px" }} color="success" onClick={handleSavePerso} >*/}
+                {/*        Enregistrer*/}
+                {/*    </MDButton>*/}
+                {/*</MDBox>*/}
 
             </ScrolingCard>
         </Modal >
