@@ -85,7 +85,9 @@ function ShowEstimate({ project, setOpen, setWarningSB }) {
     const [nombre, setNombre] = useState(0);
     const [nombrePiece, setNombrePiece] = useState(project.nbrRooms);
     const [piecesList, setPiecesList] = useState(null);
+    const [garageList, setGarageList] = useState([]);
     const [surface, setSurface] = useState(0);
+    const [surfacePieces, setSurfacePieces] = useState(0);
     const [piece, setPiece] = useState("");
     const [pieceLabel, setPieceLabel] = useState("");
     const [listPerso, setListPers] = useState([]);
@@ -235,18 +237,29 @@ function ShowEstimate({ project, setOpen, setWarningSB }) {
                 await axios.post(`${url}/api/projects/addPerso?projectId=${project.id}`, list);
             } catch (err) {
             }
-        }
+        }3
     };
 
     useEffect(() => {
         var stand = project.standingType;
         var TYP = project.houseType;
         var nbr = project.nbrRooms;
+        fetch(`${url}/api/data/getNombreDeGarages`)
+            .then((res) => res.json())
+            .then((data) => {
+                setGarageList(data);
+            })
+            .catch(error => {
+                console.error(error);
+            });
+
         if (project.id != undefined) {
             fetch(`${url}/api/projects/getPerso?projectId=${project.id}`)
                 .then((res) => res.json())
                 .then((data) => {
                     setListPers(data);
+                    var surfaceP = data.map(({ surface, nombre }) => surface * nombre).reduce((sum, i) => sum + i, 0);
+                    setSurfacePieces(surfaceP);
                 });
         }
         else {
@@ -264,6 +277,8 @@ function ShowEstimate({ project, setOpen, setWarningSB }) {
                         };
                         persoList.push(newPerso)
                     });
+                    var surfaceP = persoList.map(({ SMOY, NBRE }) => SMOY * NBRE).reduce((sum, i) => sum + i, 0);
+                    setSurfacePieces(surfaceP);
                     setListPers(persoList);
                 });
         }
@@ -377,11 +392,10 @@ function ShowEstimate({ project, setOpen, setWarningSB }) {
                                     onChange={handleChange}
                                     label="Garage *"
                                 >
-                                    <MenuItem value="">
-                                        <em>Aucune</em>
-                                    </MenuItem>
-                                    <MenuItem value="1 voiture">1 voiture</MenuItem>
-                                    <MenuItem value="2 voitures">2 voitures</MenuItem>
+                                    {garageList.map((garage) => (
+                                        <MenuItem key={garage.id} value={garage.Description}>{garage.Description}</MenuItem>
+                                    ))
+                                    }
                                 </Select>
                             </FormControl>
                         </Grid>
@@ -500,9 +514,9 @@ function ShowEstimate({ project, setOpen, setWarningSB }) {
                     <Typography id="modal-modal-description" sx={{ mt: 2, fontSize: 14, ml: 3 }} component="h6">
                         <b>Notre proposition:</b>
                         <br />
-                        {project.houseType} {project.nbrRooms}P {project.standingType} avec une surface utile de {parseFloat(project.surface)} m&sup2;
+                        {project.typeLabel} de {project.nbrRooms} Pi&eacute;ce(s) {project.standingLabel} avec une surface utile de {parseFloat(surfacePieces)} m&sup2;
                         <br />
-                        Garage de {project.garage}
+                        Garage: {project.garage}
                     </Typography>
                 </Grid>
                 <Grid item xs={12} md={12} xl={12}>

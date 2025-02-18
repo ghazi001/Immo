@@ -61,7 +61,7 @@ function Projects() {
         navigate("/nouveau-Projet");
     }
 
-    const handleRemoveProject = async(project) => {
+    const handleRemoveProject = async (project) => {
         try {
             await axios.delete(`${url}/api/projects/deleteProject?projectId=${project.id}`);
             var list = projects;
@@ -93,6 +93,8 @@ function Projects() {
             surface: project.surface,
             topologie: project.topologie,
             funding: project.financement,
+            standingLabel: project.lStand,
+            typeLabel: project.lTypeMaison,
         };
         setPorjectTarget(newProject);
         setOpen(true);
@@ -103,10 +105,10 @@ function Projects() {
             navigate("/nouveau-projet")
         else {
             fetch(`${url}/api/projects/list?userId=${currentUser.id}`)
-            .then((res) => res.json())
-            .then((data) => {
-                setProjects(data);
-            });
+                .then((res) => res.json())
+                .then((data) => {
+                    setProjects(data);
+                });
         }
     }, []);
 
@@ -181,7 +183,7 @@ function Projects() {
                                                 variant="gradient"
                                                 size="medium"
                                                 color="error"
-                                                sx={{ position: "absolute", top: 0, right: 0 , zIndex:1}}
+                                                sx={{ position: "absolute", top: 0, right: 0, zIndex: 1 }}
                                                 onClick={() => { handleRemoveProject(project) }}
                                                 iconOnly
                                             >
@@ -189,7 +191,7 @@ function Projects() {
                                             </MDButton>
                                             <MDBox position="relative" width="100%" shadow="xl" borderRadius="xl">
                                                 <CardMedia
-                                                    src={project.typeMaison == "Triplex" ? triplexImg : project.typeMaison == "Duplex" ? duplexImg : houseImg}
+                                                    src={project.lTypeMaison == "Triplex" ? triplexImg : project.lTypeMaison == "Duplex" ? duplexImg : houseImg}
                                                     component="img"
                                                     title={parseFloat(project.surface) + "m\u00b2, " + project.ville}
                                                     sx={{
@@ -203,7 +205,7 @@ function Projects() {
                                             </MDBox>
                                             <MDBox mt={1} mx={0.5}>
                                                 <MDTypography variant="button" fontWeight="regular" color="text" textTransform="capitalize">
-                                                    {project.typeStanding}
+                                                    {project.lTypeMaison}, {project.lStand}
                                                 </MDTypography>
                                                 <MDBox mb={1}>
                                                     <MDTypography
@@ -216,7 +218,8 @@ function Projects() {
                                                 </MDBox>
                                                 <MDBox mb={3} lineHeight={0}>
                                                     <MDTypography variant="button" fontWeight="light" color="text">
-                                                        {project.commune + ", " + project.zone + ", " + project.quartier}
+                                                        {project.ville + ", " + project.commune}<br />
+                                                        {project.quartier + ", " + project.lZone}
                                                     </MDTypography>
                                                 </MDBox>
                                                 <MDBox display="flex" flexDirection="column" justifyContent="center" alignItems="center">
@@ -227,7 +230,7 @@ function Projects() {
                                                         sx={{ marginBottom: 1 }}
                                                         onClick={() => { handleOpen(project) }}
                                                     >
-                                                        voir le projet
+                                                        VOIR ESTIMATION
                                                     </MDButton>
                                                     <MDButton
                                                         variant="outlined"
@@ -235,7 +238,7 @@ function Projects() {
                                                         color="success"
                                                         onClick={() => { InitializeProject(project) }}
                                                     >
-                                                        rouvrir le projet
+                                                        MODIFIER LE PROJET
                                                     </MDButton>
                                                 </MDBox>
                                             </MDBox>

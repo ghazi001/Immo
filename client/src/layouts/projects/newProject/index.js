@@ -47,6 +47,7 @@ function NewProject() {
     const [zones, setZones] = useState(null);
     const [quarter, setQuarter] = useState(JSON.parse(localStorage.getItem("quarter")) || null);
     const [quarters, setQuarters] = useState(null);
+    const [pieces, setPieces] = useState([]);
     const [projectId, setProjectId] = useState(null);
     const [titre, setTitre] = useState(JSON.parse(localStorage.getItem("titre")) || null);
     const [date, setDate] = useState(JSON.parse(localStorage.getItem("date")) || null);
@@ -140,7 +141,9 @@ function NewProject() {
                 villeId: project.ville.id,
                 communeId: project.commune.id,
                 quartierId: project.quarter.id,
+                quartierLabel: project.quarter.quartier,
                 zoneId: project.zone.id,
+                zoneLabel: project.zone.zone,
                 titre: project.titre,
                 dateTitre: project.date,
                 typeMaison: project.houseType,
@@ -242,6 +245,14 @@ function NewProject() {
 
     useEffect(() => {
         try {
+            fetch(`${url}/api/data/getNombreDePieces`)
+                .then((res) => res.json())
+                .then((data) => {
+                    setPieces(data);
+                })
+                .catch(error => {
+                    console.error(error);
+                });
             fetch(`${url}/api/data/cities`)
                 .then((res) => res.json())
                 .then((data) => {
@@ -615,18 +626,22 @@ function NewProject() {
                                                         </FormControl>
                                                     </Grid>
                                                     <Grid item xs={12} md={6} xl={6}>
-                                                        <MDBox sx={{ mx: "10%", minWidth: "80%" }}>
-                                                            <MDInput
-                                                                name="nbrPlace"
-                                                                type="number"
+                                                        <FormControl required sx={{ mx: "10%", minWidth: "80%" }}>
+                                                            <InputLabel pb={3}>Nombre de pi&eacute;ce </InputLabel>
+                                                            <Select sx={{ height: 44 }}
                                                                 value={nbrRooms}
-                                                                label="Nombre de pi&eacute;ces *"
                                                                 onChange={(e) => {
                                                                     localStorage.setItem("nbrRooms", JSON.stringify(e.target.value));
                                                                     setNbrRooms(e.target.value);
                                                                 }}
-                                                            />
-                                                        </MDBox>
+                                                                label="Nombre de pi&eacute;ces *"
+                                                            >
+                                                                {pieces.map((piece) => (
+                                                                    <MenuItem key={piece.NBPCS} value={piece.NBPCS}>{piece.Description}</MenuItem>
+                                                                ))
+                                                                }
+                                                            </Select>
+                                                        </FormControl>
                                                     </Grid>
                                                 </Grid>
                                             </MDBox>

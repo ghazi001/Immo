@@ -36,7 +36,7 @@ const Register = () => {
     const handleClick = async (e) => {
         e.preventDefault();
         try {
-           await axios.post(`${url}/api/auth/register`, inputs);
+            await axios.post(`${url}/api/auth/register`, inputs);
             setSuccessSB(true);
             if (waitnigToSignIn) {
                 setIsLogIn(true)
@@ -93,10 +93,10 @@ const Register = () => {
                         textAlign="center"
                     >
                         <MDTypography variant="h4" fontWeight="medium" color="white" mt={0}>
-                            Rejoindre nous
+                            Enregistrez-vous
                         </MDTypography>
                         <MDTypography display="block" variant="button" color="white" my={0}>
-                            Entrez votre donnee pour vous inscrire
+                            Entrez vos donn&eacute;es pour vous inscrire
                         </MDTypography>
                     </MDBox>
                     <MDBox pt={2} pb={3} px={3}>
@@ -105,7 +105,7 @@ const Register = () => {
                                 <MDInput
                                     name="name"
                                     type="text"
-                                    label="Nom et prenom"
+                                    label="Nom et pr&eacute;nom"
                                     variant="standard"
                                     onChange={handleChange}
                                     fullWidth
@@ -135,7 +135,7 @@ const Register = () => {
                                 <MDInput
                                     name="password"
                                     type="password"
-                                    label="Password"
+                                    label="Mot de passe"
                                     variant="standard"
                                     onChange={handleChange}
                                     fullWidth
@@ -143,12 +143,12 @@ const Register = () => {
                             </MDBox>
                             <MDBox mt={4} mb={1}>
                                 <MDButton variant="gradient" color="info" onClick={handleClick} fullWidth>
-                                    Registre
+                                    Cr&eacute;er votre compte
                                 </MDButton>
                             </MDBox>
                             <MDBox mt={3} mb={1} textAlign="center">
                                 <MDTypography variant="button" color="text">
-                                    Already have an account?{" "}
+                                    Vous avez d&eacute;j&agrave; un compte ? {" "}
                                     <MDTypography
                                         component={Link}
                                         to="/authentication/sign-in"
@@ -157,7 +157,7 @@ const Register = () => {
                                         fontWeight="medium"
                                         textGradient
                                     >
-                                        Sign In
+                                        Se connecter
                                     </MDTypography>
                                 </MDTypography>
                             </MDBox>
