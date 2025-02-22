@@ -1,5 +1,5 @@
 import { Fragment, useState, useEffect, useContext } from "react";
-
+import { Link } from 'react-router-dom';
 // @mui material components
 import Grid from "@mui/material/Grid";
 // Material Dashboard 2 React components
@@ -205,7 +205,7 @@ function Projects() {
                                             </MDBox>
                                             <MDBox mt={1} mx={0.5}>
                                                 <MDTypography variant="button" fontWeight="regular" color="text" textTransform="capitalize">
-                                                    {project.lTypeMaison}, {project.lStand}
+                                                    {project.typeMaisonLabel}, {project.typeStandingLabel}
                                                 </MDTypography>
                                                 <MDBox mb={1}>
                                                     <MDTypography
@@ -213,7 +213,7 @@ function Projects() {
                                                         variant="h5"
                                                         textTransform="capitalize"
                                                     >
-                                                        {parseFloat(project.surface) + "m\u00b2, " + project.ville}
+                                                        {parseFloat(project.surfaceUtile) + "m\u00b2, " + project.ville}
                                                     </MDTypography>
                                                 </MDBox>
                                                 <MDBox mb={3} lineHeight={0}>
@@ -228,7 +228,8 @@ function Projects() {
                                                         size="small"
                                                         color="info"
                                                         sx={{ marginBottom: 1 }}
-                                                        onClick={() => { handleOpen(project) }}
+                                                        component={Link}
+                                                        to={`/mes-projets/estimation/${project.id}`}
                                                     >
                                                         VOIR ESTIMATION
                                                     </MDButton>

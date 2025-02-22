@@ -237,7 +237,7 @@ function ShowEstimate({ project, setOpen, setWarningSB }) {
                 await axios.post(`${url}/api/projects/addPerso?projectId=${project.id}`, list);
             } catch (err) {
             }
-        }3
+        }
     };
 
     useEffect(() => {
