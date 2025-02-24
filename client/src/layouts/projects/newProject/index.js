@@ -24,23 +24,20 @@ import { FormControl, InputLabel, MenuItem, Modal, Select } from "@mui/material"
 
 import MDInput from "../../../components/MDInput";
 import dayjs from "dayjs";
-import ShowEstimate from "../showEstimate";
 import MDSnackbar from "../../../components/MDSnackbar";
 const steps = ["Localisation", "Titre", "Description", "Type", "Financement"];
 import axios from "axios";
+import { Initialize } from "./common.tsx";
 
 
 function NewProject() {
     const { currentUser, isLogIn, setWaitingToSignIn, url } = useContext(AuthContext);
-    const [open, setOpen] = useState(false);
     const navigate = useNavigate();
     const handleNavigate = () => { funding == null ? setErr(true) : (currentUser == null ? (setErr(false), setWaitingToSignIn(true), navigate("/authentication/sign-in")) : handleOpen()) };
-    const handleClose = () => setOpen(true);
     const [activeStep, setActiveStep] = useState(isLogIn ? 4 : 0);
     const [err, setErr] = useState(false);
     const [ville, setVille] = useState(JSON.parse(localStorage.getItem("ville")) || null);
     const [villes, setVilles] = useState(null);
-    const [project, setPorject] = useState(null);
     const [commune, setCommune] = useState(JSON.parse(localStorage.getItem("commune")) || null);
     const [communes, setCommunes] = useState(null);
     const [zone, setZone] = useState(JSON.parse(localStorage.getItem("zone")) || null);
@@ -48,7 +45,6 @@ function NewProject() {
     const [quarter, setQuarter] = useState(JSON.parse(localStorage.getItem("quarter")) || null);
     const [quarters, setQuarters] = useState(null);
     const [pieces, setPieces] = useState([]);
-    const [projectId, setProjectId] = useState(null);
     const [titre, setTitre] = useState(JSON.parse(localStorage.getItem("titre")) || null);
     const [date, setDate] = useState(JSON.parse(localStorage.getItem("date")) || null);
     const [surface, setSurface] = useState(JSON.parse(localStorage.getItem("surface")) || null);
@@ -117,78 +113,33 @@ function NewProject() {
     };
 
     const handleOpen = async () => {
-        const project = {
-            id: projectId,
-            ville: ville,
-            commune: commune,
-            quarter: quarter,
-            zone: zone,
+        const newProject = {
+            villeId: ville.id,
+            communeId: commune.id,
+            quartierId: quarter.id,
+            quartierLabel: quarter.quartier,
+            zoneId: zone.id,
+            zoneLabel: zone.zone,
             titre: titre,
-            date: date,
-            houseType: houseType,
-            standingType: standingType,
+            dateTitre: date,
+            typeMaison: houseType,
+            typeStanding: standingType,
             garage: nbrCars,
-            nbrRooms: nbrRooms,
+            nbrPiece: nbrRooms,
             surface: surface,
             topologie: topologie,
-            funding: funding,
+            financement: funding,
+            userId: currentUser.id,
         };
-
-        var stand = project.standingType;
-        var nbr = project.nbrRooms;
-        if (project.id == null) {
-            const newProject = {
-                villeId: project.ville.id,
-                communeId: project.commune.id,
-                quartierId: project.quarter.id,
-                quartierLabel: project.quarter.quartier,
-                zoneId: project.zone.id,
-                zoneLabel: project.zone.zone,
-                titre: project.titre,
-                dateTitre: project.date,
-                typeMaison: project.houseType,
-                typeStanding: project.standingType,
-                garage: project.garage,
-                nbrPiece: project.nbrRooms,
-                surface: project.surface,
-                topologie: project.topologie,
-                financement: project.funding,
-                userId: currentUser.id,
-            };
-            try {
-                let result = await axios.post(`${url}/api/projects/addProject`, newProject);
-                if (result.status == 200) {
-                    let id = result.data;
-                    project.id = id;
-                    setProjectId(id);
-                    fetch(`${url}/api/projects/getInitPerso?NBPCS=${nbr}&STAND=${stand}`)
-                        .then((res) => res.json())
-                        .then(async (data) => {
-                            var persoList = [];
-                            data.map((perso) => {
-                                const newPerso = {
-                                    id: 0,
-                                    piece: perso.PIECE,
-                                    pieceLabel: perso.LABEL,
-                                    surface: perso.SMOY,
-                                    nombre: perso.NBRE,
-                                };
-                                persoList.push(newPerso)
-                            });
-                            await axios.post(`${url}/api/projects/addPerso?projectId=${id}`, persoList).then(() => {
-                                setPorject(project);
-                                setOpen(true);
-                            });
-                        });
-                }
-            } catch (err) {
-                setErrMessage(err.response == undefined ? "Probl\u00e9me de connexion au BD" : err.response.data);
+        try {
+            let result = await axios.post(`${url}/api/projects/addProject`, newProject);
+            if (result.status == 200) {
+                let id = result.data;
+                Initialize();
+                navigate(`/mes-projets/estimation/${id}`);
             }
-        }
-        else
-        {
-            setPorject(project);
-            setOpen(true);
+        } catch (err) {
+            setErrMessage(err.response == undefined ? "Probl\u00e9me de connexion au BD" : err.response.data);
         }
     };
 
@@ -342,8 +293,7 @@ function NewProject() {
         } catch (e) {
             console.log(e);
         }
-        if (currentUser != null && isLogIn == true)
-            handleOpen();
+
     }, []);
 
     const renderWarningSB = (
@@ -352,23 +302,12 @@ function NewProject() {
             icon="warning"
             title="Impossible d'ajouter la p&eacute;rsonnalisation"
             content="V&eacute;rifier les donn&eacute;es qui ont &eacute;t&eacute; saisis!!!"
-            dateTime="à l'instant"
             open={warningSB}
             onClose={closeWarningSB}
             close={closeWarningSB}
         />
     );
 
-    const renderModal = (
-        <Modal
-            open={open}
-            onClose={handleClose}
-            aria-labelledby="modal-modal-title"
-            aria-describedby="modal-modal-description"
-        >
-            <ShowEstimate project={project} setOpen={setOpen} setWarningSB={setWarningSB} />
-        </Modal>
-    );
     return (
         <DashboardLayout>
             <DashboardNavbar />
@@ -695,7 +634,6 @@ function NewProject() {
                     </Grid>
                 </Grid>
                 {renderWarningSB}
-                {renderModal}
                 {/*<Fragment>*/}
                 {/*    <Dialog*/}
                 {/*        open={openConfirm}*/}

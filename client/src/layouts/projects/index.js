@@ -35,9 +35,6 @@ function Projects() {
     const closeSuccessSB = () => setSuccessSB(false);
     const closeErrorSB = () => setErrorSB(false);
     const closeWarningSB = () => setWarningSB(false);
-    const [open, setOpen] = useState(false);
-    const handleClose = () => setOpen(true);
-    const [projectTarget, setPorjectTarget] = useState(null);
 
     const InitializeProject = (project) => {
         var ville = { id: project.villeId, ville: project.ville }
@@ -71,33 +68,6 @@ function Projects() {
         } catch (err) {
             setErrorSB(true);
         }
-    };
-
-    const handleOpen = (project) => {
-        var ville = { id: project.villeId, ville: project.ville }
-        var commune = { id: project.communeId, commune: project.commune }
-        var zone = { id: project.zoneId, zone: project.zone }
-        var quartier = { id: project.quartierId, quartier: project.quartier }
-        const newProject = {
-            id: project.id,
-            ville: ville,
-            commune: commune,
-            quarter: quartier,
-            zone: zone,
-            titre: project.titre,
-            date: project.dateTitre,
-            houseType: project.typeMaison,
-            standingType: project.typeStanding,
-            garage: project.garage,
-            nbrRooms: project.nbrPiece,
-            surface: project.surface,
-            topologie: project.topologie,
-            funding: project.financement,
-            standingLabel: project.lStand,
-            typeLabel: project.lTypeMaison,
-        };
-        setPorjectTarget(newProject);
-        setOpen(true);
     };
 
     useEffect(() => {
@@ -148,18 +118,6 @@ function Projects() {
         />
     );
 
-
-    const renderModal = (
-        <Modal
-            open={open}
-            onClose={handleClose}
-            aria-labelledby="modal-modal-title"
-            aria-describedby="modal-modal-description"
-        >
-            <ShowEstimate project={projectTarget} setOpen={setOpen} setWarningSB={setWarningSB} />
-        </Modal>
-    );
-
     return (
         <DashboardLayout>
             <DashboardNavbar />
@@ -193,7 +151,7 @@ function Projects() {
                                                 <CardMedia
                                                     src={project.lTypeMaison == "Triplex" ? triplexImg : project.lTypeMaison == "Duplex" ? duplexImg : houseImg}
                                                     component="img"
-                                                    title={parseFloat(project.surface) + "m\u00b2, " + project.ville}
+                                                    title={parseFloat(project.surfaceUtile) + "m\u00b2, " + project.estimation}
                                                     sx={{
                                                         maxWidth: "100%",
                                                         margin: 0,
@@ -213,7 +171,7 @@ function Projects() {
                                                         variant="h5"
                                                         textTransform="capitalize"
                                                     >
-                                                        {parseFloat(project.surfaceUtile) + "m\u00b2, " + project.ville}
+                                                        {parseFloat(project.surfaceUtile) + "m\u00b2, " + project.estimation}
                                                     </MDTypography>
                                                 </MDBox>
                                                 <MDBox mb={3} lineHeight={0}>
@@ -253,7 +211,6 @@ function Projects() {
                 {renderWarningSB}
                 {renderSuccessSB}
                 {renderErrorSB}
-                {renderModal}
             </MDBox>
             <Footer />
         </DashboardLayout>

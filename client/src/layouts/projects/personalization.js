@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext } from "react";
 import { styled } from '@mui/material/styles';
-import { Box, CircularProgress, FormControl, Icon, MenuItem, Modal, TableBody, Typography, InputLabel, Select } from "@mui/material";
+import { CircularProgress, FormControl, Icon, MenuItem, TableBody, Typography, InputLabel, Select } from "@mui/material";
 import MDButton from "components/MDButton";
 import { withStyles } from "@material-ui/core/styles";
 import Grid from "@mui/material/Grid";
@@ -57,7 +57,7 @@ function Perso({ project, setProject, garageList, standingList, setBudget, setCo
         garage: project.garage,
     });
 
-    const handleChange = (e) => {
+    const handleChange = async (e) => {
         setInputs((prev) => ({ ...prev, [e.target.name]: e.target.value }));
         var updatedProject = project;
         switch (e.target.name) {
@@ -66,6 +66,32 @@ function Perso({ project, setProject, garageList, standingList, setBudget, setCo
             case "garage": updatedProject.garage = e.target.value; break;
         }
         setProject(updatedProject);
+        if (project.id != undefined) {
+            try {
+                let result = await axios.post(`${url}/api/projects/updateProjectTypeStandingGarage?projectId=${project.id}&TYP=${updatedProject.typeMaison}&STAND=${updatedProject.typeStanding}&GARAGE=${updatedProject.garage}`);
+                if (result.status == 200) {
+                    try {
+                        fetch(`${url}/api/projects/getEstimationByIdProject?idProject=${project.id}`)
+                            .then((res) => res.json())
+                            .then((data) => {
+                                setBudget(data[0]);
+                            });
+                    } catch (Exception) {
+                        setBudget(null);
+                    }
+                    try {
+                        fetch(`${url}/api/projects/detailCorpEtatByIdProject?projectId=${project.id}`)
+                            .then((res) => res.json())
+                            .then((data) => {
+                                setCorps(data);
+                            });
+                    } catch (Exception) {
+                        setCorps(null);
+                    }
+                }
+            } catch (err) {
+            }
+        }
     };
 
 
