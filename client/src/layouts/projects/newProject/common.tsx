@@ -26,6 +26,8 @@ export function Initialize() {
     localStorage.setItem("surface", JSON.stringify(0));
     localStorage.setItem("topologie", JSON.stringify(null));
     localStorage.setItem("funding", JSON.stringify(null));
+    localStorage.setItem("otherQuarter", JSON.stringify(null));
+    localStorage.setItem("otherZone", JSON.stringify(null));
 }
 
 export function subtotalMin(items: readonly Row[]) {

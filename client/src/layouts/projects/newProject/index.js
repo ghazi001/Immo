@@ -41,8 +41,10 @@ function NewProject() {
     const [commune, setCommune] = useState(JSON.parse(localStorage.getItem("commune")) || null);
     const [communes, setCommunes] = useState(null);
     const [zone, setZone] = useState(JSON.parse(localStorage.getItem("zone")) || null);
+    const [otherZone, setOtherZone] = useState(JSON.parse(localStorage.getItem("otherZone")) || null);
     const [zones, setZones] = useState(null);
     const [quarter, setQuarter] = useState(JSON.parse(localStorage.getItem("quarter")) || null);
+    const [otherQuarter, setOtherQuarter] = useState(JSON.parse(localStorage.getItem("otherQuarter")) || null);
     const [quarters, setQuarters] = useState(null);
     const [pieces, setPieces] = useState([]);
     const [titre, setTitre] = useState(JSON.parse(localStorage.getItem("titre")) || null);
@@ -61,6 +63,8 @@ function NewProject() {
     const [titleList, setTitleList] = useState([]);
     const [garageList, setGarageList] = useState([]);
     const [warningSB, setWarningSB] = useState(false);
+    const [isOtherZone, setIsOtherZone] = useState((JSON.parse(localStorage.getItem("zone"))).zone == "Autre" || false);
+    const [isOtherQuarter, setIsOtherQuarter] = useState((JSON.parse(localStorage.getItem("quarter"))).quartier == "Autre" || false);
     const closeWarningSB = () => setWarningSB(false);
     const [errMessage, setErrMessage] = useState("");
 
@@ -104,6 +108,12 @@ function NewProject() {
         localStorage.setItem("quarter", JSON.stringify(quarter));
         localStorage.setItem("zone", JSON.stringify(null));
         setQuarter(quarter);
+        setIsOtherQuarter(quarter.id == 0 && quarter.quartier == "Autre");
+        setIsOtherZone(false);
+        setOtherZone(null);
+        setOtherQuarter(null);
+        localStorage.setItem("otherQuarter", JSON.stringify(null));
+        localStorage.setItem("otherZone", JSON.stringify(null));
         setZone(null);
         fetch(`${url}/api/data/zones?quartier=${quarter.id}`)
             .then((res) => res.json())
@@ -112,14 +122,23 @@ function NewProject() {
             });
     };
 
+    const handleChangeZone = (event: SelectChangeEvent) => {
+        let zone = event.target.value;
+        setZone(zone);
+        localStorage.setItem("zone", JSON.stringify(zone));
+        setIsOtherZone(zone.id == 0 && zone.zone == "Autre");
+        setOtherZone(null);
+        localStorage.setItem("otherZone", JSON.stringify(null));
+    };
+
     const handleOpen = async () => {
         const newProject = {
             villeId: ville.id,
             communeId: commune.id,
             quartierId: quarter.id,
-            quartierLabel: quarter.quartier,
+            quartierLabel: (quarter.id == 0 && quarter.quartier == "Autre") ? otherQuarter : quarter.quartier,
             zoneId: zone.id,
-            zoneLabel: zone.zone,
+            zoneLabel: (zone.id == 0 && zone.zone == "Autre") ? otherZone : zone.zone,
             titre: titre,
             dateTitre: date,
             typeMaison: houseType,
@@ -396,6 +415,19 @@ function NewProject() {
                                                                 </Select>
                                                             }
                                                         </FormControl>
+                                                        {isOtherQuarter &&
+                                                            <MDInput
+                                                                sx={{ width: "80%", mx: "10%", mt: 2 }}
+                                                                name="otherQuarter"
+                                                                type="text"
+                                                                value={otherQuarter}
+                                                                label="Autre"
+                                                                onChange={(e) => {
+                                                                    localStorage.setItem("otherQuarter", JSON.stringify(e.target.value));
+                                                                    setOtherQuarter(e.target.value);
+                                                                }}
+                                                            />
+                                                        }
                                                     </Grid>
                                                     <Grid item xs={12} md={6} xl={6}>
                                                         <FormControl required sx={{ mx: "10%", minWidth: "80%" }}>
@@ -403,10 +435,8 @@ function NewProject() {
                                                             {zones &&
                                                                 <Select sx={{ height: 44 }}
                                                                     value={zone != null ? zones?.find(x => x.id == zone?.id) : null}
-                                                                    onChange={(e) => {
-                                                                        setZone(e.target.value);
-                                                                        localStorage.setItem("zone", JSON.stringify(e.target.value));
-                                                                    }} label="Zone *">
+                                                                    onChange={handleChangeZone}
+                                                                    label="Zone *">
                                                                     {zones &&
                                                                         zones.map((item) => (
                                                                             <MenuItem key={item.id} value={item}>
@@ -416,6 +446,19 @@ function NewProject() {
                                                                 </Select>
                                                             }
                                                         </FormControl>
+                                                        {isOtherZone &&
+                                                            <MDInput
+                                                                sx={{ width: "80%", mx: "10%", mt: 2 }}
+                                                                name="otherZone"
+                                                                type="text"
+                                                                value={otherZone}
+                                                                label="Autre"
+                                                                onChange={(e) => {
+                                                                    localStorage.setItem("otherZone", JSON.stringify(e.target.value));
+                                                                    setOtherZone(e.target.value);
+                                                                }}
+                                                            />
+                                                        }
                                                     </Grid>
                                                 </Grid>
                                             </MDBox>

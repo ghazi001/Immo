@@ -53,7 +53,6 @@ function Estimate() {
     const [loadingCorps, setLoadingCorps] = useState(true);
     const [corps, setCorps] = useState(null);
     const [open, setOpen] = useState(false);
-    const handleClose = () => setOpen(false);
     const handleOpen = () => setOpen(true);
     const [piecesList, setPiecesList] = useState([]);
     const [constructionList, setConstructionList] = useState([]);
@@ -131,7 +130,6 @@ function Estimate() {
     const renderModalPerso = (
         <Modal
             open={open}
-            onClose={handleClose}
             aria-labelledby="modal-modal-title"
             aria-describedby="modal-modal-description"
         >

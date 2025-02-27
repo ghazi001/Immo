@@ -21,7 +21,6 @@ import MDTypography from "../../components/MDTypography";
 import MDButton from "../../components/MDButton";
 import dayjs from "dayjs";
 import MDSnackbar from "../../components/MDSnackbar";
-import ShowEstimate from "./showEstimate";
 import axios from "axios";
 
 
@@ -55,6 +54,8 @@ function Projects() {
         localStorage.setItem("surface", JSON.stringify(project.surface));
         localStorage.setItem("topologie", JSON.stringify(project.topologie));
         localStorage.setItem("funding", JSON.stringify(project.financement));
+        localStorage.setItem("otherQuarter", quartier.id == 0 ? JSON.stringify(null) : JSON.stringify(project.quartierLabel));
+        localStorage.setItem("otherZone", zone.id == 0 ? JSON.stringify(null) : JSON.stringify(project.zoneLabel));
         navigate("/nouveau-Projet");
     }
 
@@ -177,7 +178,7 @@ function Projects() {
                                                 <MDBox mb={3} lineHeight={0}>
                                                     <MDTypography variant="button" fontWeight="light" color="text">
                                                         {project.ville + ", " + project.commune}<br />
-                                                        {project.quartier + ", " + project.lZone}
+                                                        {project.quartierLabel + ", " + project.zoneLabel}
                                                     </MDTypography>
                                                 </MDBox>
                                                 <MDBox display="flex" flexDirection="column" justifyContent="center" alignItems="center">

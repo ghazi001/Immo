@@ -61,7 +61,7 @@ function Perso({ project, setProject, garageList, standingList, setBudget, setCo
         setInputs((prev) => ({ ...prev, [e.target.name]: e.target.value }));
         var updatedProject = project;
         switch (e.target.name) {
-            case "houseType": updatedProject.typeMaison = e.target.value; break;
+            case "houseType": updatedProject.typeMaison = e.target.value; updatedProject.typeMaisonLabel = constructionList.find(item => item.TYP === e.target.value).LABEL; break;
             case "standingType": updatedProject.typeStanding = e.target.value; updatedProject.typeStandingLabel = standingList.find(item => item.STAND === e.target.value).LABEL; break;
             case "garage": updatedProject.garage = e.target.value; break;
         }
