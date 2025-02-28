@@ -54,8 +54,8 @@ function Projects() {
         localStorage.setItem("surface", JSON.stringify(project.surface));
         localStorage.setItem("topologie", JSON.stringify(project.topologie));
         localStorage.setItem("funding", JSON.stringify(project.financement));
-        localStorage.setItem("otherQuarter", quartier.id == 0 ? JSON.stringify(null) : JSON.stringify(project.quartierLabel));
-        localStorage.setItem("otherZone", zone.id == 0 ? JSON.stringify(null) : JSON.stringify(project.zoneLabel));
+        localStorage.setItem("otherQuarter", quartier.id != 0 ? JSON.stringify(null) : JSON.stringify(project.quartierAutreLabel));
+        localStorage.setItem("otherZone", zone.id != 0 ? JSON.stringify(null) : JSON.stringify(project.zoneAutreLabel));
         navigate("/nouveau-Projet");
     }
 
