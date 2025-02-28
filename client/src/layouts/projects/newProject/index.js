@@ -63,8 +63,8 @@ function NewProject() {
     const [titleList, setTitleList] = useState([]);
     const [garageList, setGarageList] = useState([]);
     const [warningSB, setWarningSB] = useState(false);
-    const [isOtherZone, setIsOtherZone] = useState((JSON.parse(localStorage.getItem("zone"))).zone == "Autre" || false);
-    const [isOtherQuarter, setIsOtherQuarter] = useState((JSON.parse(localStorage.getItem("quarter"))).quartier == "Autre" || false);
+    const [isOtherZone, setIsOtherZone] = useState((JSON.parse(localStorage.getItem("zone")))?.zone == "Autre" || false);
+    const [isOtherQuarter, setIsOtherQuarter] = useState((JSON.parse(localStorage.getItem("quarter")))?.quartier == "Autre" || false);
     const closeWarningSB = () => setWarningSB(false);
     const [errMessage, setErrMessage] = useState("");
 
@@ -214,7 +214,7 @@ function NewProject() {
     };
 
     useEffect(() => {
-        try {
+         try {
             fetch(`${url}/api/data/getNombreDePieces`)
                 .then((res) => res.json())
                 .then((data) => {
