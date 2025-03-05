@@ -22,6 +22,7 @@ import MDButton from "../../components/MDButton";
 import dayjs from "dayjs";
 import MDSnackbar from "../../components/MDSnackbar";
 import axios from "axios";
+import backgroundImage from "assets/images/bg-profile.jpeg";
 
 
 function Projects() {
@@ -122,8 +123,31 @@ function Projects() {
     return (
         <DashboardLayout>
             <DashboardNavbar />
+            <MDBox
+                display="flex"
+                alignItems="center"
+                position="relative"
+                minHeight="10.75rem"
+                borderRadius="xl"
+                sx={{
+                    backgroundImage: ({ functions: { rgba, linearGradient }, palette: { gradients } }) =>
+                        `${linearGradient(
+                            rgba(gradients.info.main, 0.6),
+                            rgba(gradients.info.state, 0.6)
+                        )}, url(${backgroundImage})`,
+                    backgroundSize: "cover",
+                    backgroundPosition: "50%",
+                    overflow: "hidden",
+                }}
+            />
             <MDBox mb={3}>
-                <Card>
+                <Card sx={{
+                    position: "relative",
+                    mt: -8,
+                    mx: 3,
+                    py: 2,
+                    px: 2,
+                }}>
                     <MDBox py={2}>
                         <Grid container spacing={6} p={3}>
                             {projects &&

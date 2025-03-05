@@ -133,7 +133,7 @@ function Estimate() {
             aria-labelledby="modal-modal-title"
             aria-describedby="modal-modal-description"
         >
-            <ScrolingCard sx={{ width: "50%" }} >
+            <ScrolingCard sx={{ width: { xs: "100%", sm: "50%"} }} >
                 <Perso project={project} setProject={setProject} piecesList={piecesList} setBudget={setBudget} setCorps={setCorps}
                     constructionList={constructionList} standingList={standingList} garageList={garageList} setOpen={setOpen} setWarningSB={setWarningSB}
                 />

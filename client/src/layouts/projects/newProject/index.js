@@ -28,6 +28,7 @@ import MDSnackbar from "../../../components/MDSnackbar";
 const steps = ["Localisation", "Titre", "Description", "Type", "Financement"];
 import axios from "axios";
 import { Initialize } from "./common.tsx";
+import backgroundImage from "assets/images/Immo.jpg";
 
 
 function NewProject() {
@@ -330,12 +331,32 @@ function NewProject() {
     return (
         <DashboardLayout>
             <DashboardNavbar />
-            <MDBox mt={6} mb={3}>
+            <MDBox
+                display="flex"
+                alignItems="center"
+                position="relative"
+                minHeight="10.75rem"
+                borderRadius="xl"
+                sx={{
+                    backgroundImage: ({ functions: { rgba, linearGradient }, palette: { gradients } }) =>
+                        `url(${backgroundImage})`,
+                    backgroundSize: "cover",
+                    backgroundPosition: "50%",
+                    overflow: "hidden",
+                }}
+            />
+            <MDBox mb={3}>
                 <Grid container spacing={3} justifyContent="center">
                     <Grid item xs={12} lg={12}>
-                        <Card>
-                            <MDBox sx={{ width: "100%" }} p={3}>
-                                <Stepper activeStep={activeStep} style={{ height: 10 }}>
+                        <Card sx={{
+                            position: "relative",
+                            mt: -6,
+                            mx: {xs:1,sm:3},
+                            py: 2,
+                            px: 2,
+                        }}>
+                            <MDBox sx={{ width: "100%" }} p={0}>
+                                <Stepper activeStep={activeStep} style={{ height: 10, display: "flex" }}>
                                     {steps.map((label, index) => {
                                         const stepProps: { completed?: boolean } = {};
                                         const labelProps: {
@@ -354,15 +375,15 @@ function NewProject() {
                                     </MDTypography>
                                 }
                                 {activeStep === 0 && (
-                                    <Grid item xs={12} lg={12} m={3}>
+                                    <Grid item xs={12} lg={12} m={{ xs: 1, sm:3}}>
                                         <Card>
-                                            <MDBox pr={1} m={3}>
+                                            <MDBox pr={1} m={{ xs: 1, sm: 3 }}>
                                                 <MDTypography ml={2}>
                                                     Renseignez la localisation de votre terrain
                                                 </MDTypography>
-                                                <Grid container spacing={2} p={3}>
+                                                <Grid container spacing={2} p={{ xs: 1, sm: 3 }}>
                                                     <Grid item xs={12} md={6} xl={6}>
-                                                        <FormControl required sx={{ mx: "10%", minWidth: "80%" }}>
+                                                        <FormControl required sx={{ mx: { xs: 0, sm: "10%" }, minWidth: {xs:"100%", sm:"80%"} }}>
                                                             <InputLabel pl={3}>Ville </InputLabel>
                                                             {villes &&
                                                                 <Select sx={{ height: 44 }}
@@ -380,7 +401,7 @@ function NewProject() {
                                                         </FormControl>
                                                     </Grid>
                                                     <Grid item xs={12} md={6} xl={6}>
-                                                        <FormControl required sx={{ mx: "10%", minWidth: "80%" }}>
+                                                        <FormControl required sx={{ mx: { xs: 0, sm: "10%" }, minWidth: { xs: "100%", sm: "80%" } }}>
                                                             <InputLabel pl={3}>Commmune </InputLabel>
                                                             {communes && <Select sx={{ height: 44 }}
                                                                 value={commune != null ? communes?.find(x => x.id == commune?.id) : null}
@@ -398,7 +419,7 @@ function NewProject() {
                                                         </FormControl>
                                                     </Grid>
                                                     <Grid item xs={12} md={6} xl={6}>
-                                                        <FormControl required sx={{ mx: "10%", minWidth: "80%" }}>
+                                                        <FormControl required sx={{ mx: { xs: 0, sm: "10%" }, minWidth: {xs:"100%", sm:"80%"} }}>
                                                             <InputLabel pl={3}>Quarter</InputLabel>
                                                             {quarters &&
                                                                 <Select sx={{ height: 44 }}
@@ -417,7 +438,7 @@ function NewProject() {
                                                         </FormControl>
                                                         {isOtherQuarter &&
                                                             <MDInput
-                                                                sx={{ width: "80%", mx: "10%", mt: 2 }}
+                                                                sx={{ mx: { xs: 0, sm: "10%" }, minWidth: {xs:"100%", sm:"80%"} , mt: 2 }}
                                                                 name="otherQuarter"
                                                                 type="text"
                                                                 value={otherQuarter}
@@ -430,7 +451,7 @@ function NewProject() {
                                                         }
                                                     </Grid>
                                                     <Grid item xs={12} md={6} xl={6}>
-                                                        <FormControl required sx={{ mx: "10%", minWidth: "80%" }}>
+                                                        <FormControl required sx={{ mx: { xs: 0, sm: "10%" }, minWidth: {xs:"100%", sm:"80%"} }}>
                                                             <InputLabel pb={3}>Zone</InputLabel>
                                                             {zones &&
                                                                 <Select sx={{ height: 44 }}
@@ -448,7 +469,7 @@ function NewProject() {
                                                         </FormControl>
                                                         {isOtherZone &&
                                                             <MDInput
-                                                                sx={{ width: "80%", mx: "10%", mt: 2 }}
+                                                                sx={{ mx: { xs: 0, sm: "10%" }, minWidth: {xs:"100%", sm:"80%"} , mt: 2 }}
                                                                 name="otherZone"
                                                                 type="text"
                                                                 value={otherZone}
@@ -466,13 +487,13 @@ function NewProject() {
                                     </Grid>
                                 )}
                                 {activeStep === 1 && (
-                                    <Grid item xs={12} lg={12} m={3}>
+                                    <Grid item xs={12} lg={12} m={{ xs: 1, sm: 3 }}>
                                         <Card>
-                                            <MDBox pr={1} m={3}>
+                                            <MDBox pr={1} m={{ xs: 1, sm: 3 }}>
                                                 <MDTypography ml={2}>
                                                     Avez-vous un titre de propri&eacute;t&eacute; sur ce terrain ?
                                                 </MDTypography>
-                                                <Grid container spacing={2} p={3}>
+                                                <Grid container spacing={2} p={{ xs: 1, sm: 3 }}>
                                                     <Grid item xs={12} md={6} xl={6}>
                                                         <FormControl required sx={{ mx: "10%", mt: "8px", minWidth: "80%" }}>
                                                             <InputLabel pl={3}>Titre propri&eacute;t&eacute; </InputLabel>
@@ -489,7 +510,7 @@ function NewProject() {
                                                         </FormControl>
                                                     </Grid>
                                                     <Grid item xs={12} md={6} xl={6}>
-                                                        <FormControl required sx={{ mx: "10%", minWidth: "80%" }}>
+                                                        <FormControl required sx={{ mx: { xs: 0, sm: "10%" }, minWidth: {xs:"100%", sm:"80%"} }}>
                                                             <LocalizationProvider dateAdapter={AdapterDayjs}>
                                                                 <DemoContainer components={["DatePicker"]} sx={{ mx: "10%", minWidth: "80%" }}>
                                                                     <DatePicker
@@ -511,15 +532,15 @@ function NewProject() {
                                     </Grid>
                                 )}
                                 {activeStep === 2 && (
-                                    <Grid item xs={12} lg={12} m={3}>
+                                    <Grid item xs={12} lg={12} m={{ xs: 1, sm: 3 }}>
                                         <Card>
-                                            <MDBox pr={1} m={3}>
+                                            <MDBox pr={1} m={{ xs: 1, sm: 3 }}>
                                                 <MDTypography ml={2}>
                                                     Description du terrain ?
                                                 </MDTypography>
-                                                <Grid container spacing={2} p={3}>
+                                                <Grid container spacing={2} p={{ xs: 1, sm: 3 }}>
                                                     <Grid item xs={12} md={6} xl={6}>
-                                                        <MDBox sx={{ mx: "10%", minWidth: "80%" }}>
+                                                        <MDBox sx={{ mx: { xs: 0, sm: "10%" }, minWidth: {xs:"100%", sm:"80%"} }}>
                                                             <MDInput
                                                                 name="surface"
                                                                 type="number"
@@ -534,7 +555,7 @@ function NewProject() {
                                                     </Grid>
                                                     <Grid item xs={12} md={6} xl={6}>
                                                         <MDBox pr={1}>
-                                                            <FormControl required sx={{ mx: "10%", minWidth: "80%" }}>
+                                                            <FormControl required sx={{ mx: { xs: 0, sm: "10%" }, minWidth: {xs:"100%", sm:"80%"} }}>
                                                                 <InputLabel p={3}>Topologie </InputLabel>
                                                                 <Select sx={{ height: 44 }}
                                                                     value={topologie}
@@ -555,15 +576,15 @@ function NewProject() {
                                     </Grid>
                                 )}
                                 {activeStep === 3 && (
-                                    <Grid item xs={12} lg={12} m={3}>
+                                    <Grid item xs={12} lg={12} m={{ xs: 1, sm: 3 }}>
                                         <Card>
-                                            <MDBox pr={1} m={3}>
+                                            <MDBox pr={1} m={{ xs: 1, sm: 3 }}>
                                                 <MDTypography ml={2}>
                                                     Type de bien ?
                                                 </MDTypography>
-                                                <Grid container spacing={2} p={3}>
+                                                <Grid container spacing={2} p={{ xs: 1, sm: 3 }}>
                                                     <Grid item xs={12} md={6} xl={6}>
-                                                        <FormControl required sx={{ mx: "10%", minWidth: "80%" }}>
+                                                        <FormControl required sx={{ mx: { xs: 0, sm: "10%" }, minWidth: {xs:"100%", sm:"80%"} }}>
                                                             <InputLabel pl={3}>Type de maison </InputLabel>
                                                             <Select sx={{ height: 44 }}
                                                                 value={houseType}
@@ -578,7 +599,7 @@ function NewProject() {
                                                         </FormControl>
                                                     </Grid>
                                                     <Grid item xs={12} md={6} xl={6}>
-                                                        <FormControl required sx={{ mx: "10%", minWidth: "80%" }}>
+                                                        <FormControl required sx={{ mx: { xs: 0, sm: "10%" }, minWidth: {xs:"100%", sm:"80%"} }}>
                                                             <InputLabel pb={3}>Type de standing </InputLabel>
                                                             <Select sx={{ height: 44 }}
                                                                 value={standingType}
@@ -593,7 +614,7 @@ function NewProject() {
                                                         </FormControl>
                                                     </Grid>
                                                     <Grid item xs={12} md={6} xl={6}>
-                                                        <FormControl required sx={{ mx: "10%", minWidth: "80%" }}>
+                                                        <FormControl required sx={{ mx: { xs: 0, sm: "10%" }, minWidth: {xs:"100%", sm:"80%"} }}>
                                                             <InputLabel pb={3}>Garage </InputLabel>
                                                             <Select sx={{ height: 44 }}
                                                                 value={nbrCars}
@@ -608,7 +629,7 @@ function NewProject() {
                                                         </FormControl>
                                                     </Grid>
                                                     <Grid item xs={12} md={6} xl={6}>
-                                                        <FormControl required sx={{ mx: "10%", minWidth: "80%" }}>
+                                                        <FormControl required sx={{ mx: { xs: 0, sm: "10%" }, minWidth: {xs:"100%", sm:"80%"} }}>
                                                             <InputLabel pb={3}>Nombre de pi&eacute;ce </InputLabel>
                                                             <Select sx={{ height: 44 }}
                                                                 value={nbrRooms}
@@ -631,13 +652,13 @@ function NewProject() {
                                     </Grid>
                                 )}
                                 {activeStep === 4 && (
-                                    <Grid item xs={12} lg={12} m={3}>
+                                    <Grid item xs={12} lg={12} m={{ xs: 1, sm: 3 }}>
                                         <Card>
-                                            <MDBox pr={1} m={3}>
+                                            <MDBox pr={1} m={{ xs: 1, sm: 3 }}>
                                                 <MDTypography sx={{ mt: 2, mb: 3 }}>
                                                     Comment comptez-vous financier votre projet de construction?
                                                 </MDTypography>
-                                                <FormControl required sx={{ mx: "10%", minWidth: "50%" }}>
+                                                <FormControl required sx={{ mx: { xs: 0, sm: "10%" }, minWidth: {xs:"100%",sm:"80%",md:"50%"} }}>
                                                     <InputLabel sx={{ p: 0 }}>Financement </InputLabel>
                                                     <Select sx={{ height: 44 }}
                                                         value={funding}
