@@ -13,7 +13,7 @@ import MDSnackbar from "../../../components/MDSnackbar";
 import { AuthContext } from "../../../context/authContext";
 
 const Register = () => {
-    const { waitnigToSignIn, setIsLogIn, setWaitingToSignIn, url } = useContext(AuthContext);
+    const { url } = useContext(AuthContext);
     const [successSB, setSuccessSB] = useState(false);
     const [errorSB, setErrorSB] = useState(false);
     const navigate = useNavigate();
@@ -38,14 +38,7 @@ const Register = () => {
         try {
             var res = await axios.post(`${url}/api/auth/register`, inputs);
             setSuccessSB(true);
-            if (waitnigToSignIn) {
-                setIsLogIn(true)
-                setWaitingToSignIn(false)
-                navigate("/nouveau-Projet");
-            }
-            else {
-                navigate("/");
-            }
+            navigate("/authentication/sign-in");
         } catch (err) {
             setErr(err.response == undefined ? "Probléme de connexion au BD" : err.response.data);
             setErrorSB(true);
