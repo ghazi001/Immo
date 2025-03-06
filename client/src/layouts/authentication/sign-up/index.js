@@ -36,7 +36,7 @@ const Register = () => {
     const handleClick = async (e) => {
         e.preventDefault();
         try {
-            await axios.post(`${url}/api/auth/register`, inputs);
+            var res = await axios.post(`${url}/api/auth/register`, inputs);
             setSuccessSB(true);
             if (waitnigToSignIn) {
                 setIsLogIn(true)

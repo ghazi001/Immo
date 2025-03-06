@@ -20,7 +20,7 @@ import BasicLayout from "layouts/authentication/components/BasicLayout";
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
 
 function Basic() {
-    const { login, waitnigToSignIn, setIsLogIn, setWaitingToSignIn } = useContext(AuthContext);
+    const { login } = useContext(AuthContext);
     const [err, setErr] = useState(null);
     const navigate = useNavigate();
 
@@ -32,14 +32,6 @@ function Basic() {
         e.preventDefault();
         try {
             await login(inputs);
-            if (waitnigToSignIn) {
-                setIsLogIn(true)
-                setWaitingToSignIn(false)
-                navigate("/nouveau-Projet");
-            }
-            else {
-                navigate("/");
-            }
         } catch (err) {
             setErr(err.response.data);
         }

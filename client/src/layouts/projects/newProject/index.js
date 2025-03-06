@@ -32,9 +32,9 @@ import backgroundImage from "assets/images/Immo.jpg";
 
 
 function NewProject() {
-    const { currentUser, isLogIn, setWaitingToSignIn, url } = useContext(AuthContext);
+    const { currentUser, isLogIn, url, setNewProject } = useContext(AuthContext);
     const navigate = useNavigate();
-    const handleNavigate = () => { funding == null ? setErr(true) : (currentUser == null ? (setErr(false), setWaitingToSignIn(true), navigate("/authentication/sign-in")) : handleOpen()) };
+    const handleNavigate = () => { funding == null ? setErr(true) : handleOpen() };
     const [activeStep, setActiveStep] = useState(isLogIn ? 4 : 0);
     const [err, setErr] = useState(false);
     const [ville, setVille] = useState(JSON.parse(localStorage.getItem("ville")) || null);
@@ -149,17 +149,23 @@ function NewProject() {
             surface: surface,
             topologie: topologie,
             financement: funding,
-            userId: currentUser.id,
         };
-        try {
-            let result = await axios.post(`${url}/api/projects/addProject`, newProject);
-            if (result.status == 200) {
-                let id = result.data;
-                Initialize();
-                navigate(`/mes-projets/estimation/${id}`);
+        if (currentUser == null) {
+            setNewProject(newProject);
+            navigate("/authentication/sign-in");
+        }
+        else {
+            newProject.userId = currentUser.id;
+            try {
+                let result = await axios.post(`${url}/api/projects/addProject`, newProject);
+                if (result.status == 200) {
+                    let id = result.data;
+                    Initialize();
+                    navigate(`/mes-projets/estimation/${id}`);
+                }
+            } catch (err) {
+                setErrMessage(err.response == undefined ? "Probl\u00e9me de connexion au BD" : err.response.data);
             }
-        } catch (err) {
-            setErrMessage(err.response == undefined ? "Probl\u00e9me de connexion au BD" : err.response.data);
         }
     };
 
@@ -215,7 +221,7 @@ function NewProject() {
     };
 
     useEffect(() => {
-         try {
+        try {
             fetch(`${url}/api/data/getNombreDePieces`)
                 .then((res) => res.json())
                 .then((data) => {
@@ -351,7 +357,7 @@ function NewProject() {
                         <Card sx={{
                             position: "relative",
                             mt: -6,
-                            mx: {xs:1,sm:3},
+                            mx: { xs: 1, sm: 3 },
                             py: 2,
                             px: 2,
                         }}>
@@ -375,7 +381,7 @@ function NewProject() {
                                     </MDTypography>
                                 }
                                 {activeStep === 0 && (
-                                    <Grid item xs={12} lg={12} m={{ xs: 1, sm:3}}>
+                                    <Grid item xs={12} lg={12} m={{ xs: 1, sm: 3 }}>
                                         <Card>
                                             <MDBox pr={1} m={{ xs: 1, sm: 3 }}>
                                                 <MDTypography ml={2}>
@@ -383,7 +389,7 @@ function NewProject() {
                                                 </MDTypography>
                                                 <Grid container spacing={2} p={{ xs: 1, sm: 3 }}>
                                                     <Grid item xs={12} md={6} xl={6}>
-                                                        <FormControl required sx={{ mx: { xs: 0, sm: "10%" }, minWidth: {xs:"100%", sm:"80%"} }}>
+                                                        <FormControl required sx={{ mx: { xs: 0, sm: "10%" }, minWidth: { xs: "100%", sm: "80%" } }}>
                                                             <InputLabel pl={3}>Ville </InputLabel>
                                                             {villes &&
                                                                 <Select sx={{ height: 44 }}
@@ -419,7 +425,7 @@ function NewProject() {
                                                         </FormControl>
                                                     </Grid>
                                                     <Grid item xs={12} md={6} xl={6}>
-                                                        <FormControl required sx={{ mx: { xs: 0, sm: "10%" }, minWidth: {xs:"100%", sm:"80%"} }}>
+                                                        <FormControl required sx={{ mx: { xs: 0, sm: "10%" }, minWidth: { xs: "100%", sm: "80%" } }}>
                                                             <InputLabel pl={3}>Quarter</InputLabel>
                                                             {quarters &&
                                                                 <Select sx={{ height: 44 }}
@@ -438,7 +444,7 @@ function NewProject() {
                                                         </FormControl>
                                                         {isOtherQuarter &&
                                                             <MDInput
-                                                                sx={{ mx: { xs: 0, sm: "10%" }, minWidth: {xs:"100%", sm:"80%"} , mt: 2 }}
+                                                                sx={{ mx: { xs: 0, sm: "10%" }, minWidth: { xs: "100%", sm: "80%" }, mt: 2 }}
                                                                 name="otherQuarter"
                                                                 type="text"
                                                                 value={otherQuarter}
@@ -451,7 +457,7 @@ function NewProject() {
                                                         }
                                                     </Grid>
                                                     <Grid item xs={12} md={6} xl={6}>
-                                                        <FormControl required sx={{ mx: { xs: 0, sm: "10%" }, minWidth: {xs:"100%", sm:"80%"} }}>
+                                                        <FormControl required sx={{ mx: { xs: 0, sm: "10%" }, minWidth: { xs: "100%", sm: "80%" } }}>
                                                             <InputLabel pb={3}>Zone</InputLabel>
                                                             {zones &&
                                                                 <Select sx={{ height: 44 }}
@@ -469,7 +475,7 @@ function NewProject() {
                                                         </FormControl>
                                                         {isOtherZone &&
                                                             <MDInput
-                                                                sx={{ mx: { xs: 0, sm: "10%" }, minWidth: {xs:"100%", sm:"80%"} , mt: 2 }}
+                                                                sx={{ mx: { xs: 0, sm: "10%" }, minWidth: { xs: "100%", sm: "80%" }, mt: 2 }}
                                                                 name="otherZone"
                                                                 type="text"
                                                                 value={otherZone}
@@ -510,7 +516,7 @@ function NewProject() {
                                                         </FormControl>
                                                     </Grid>
                                                     <Grid item xs={12} md={6} xl={6}>
-                                                        <FormControl required sx={{ mx: { xs: 0, sm: "10%" }, minWidth: {xs:"100%", sm:"80%"} }}>
+                                                        <FormControl required sx={{ mx: { xs: 0, sm: "10%" }, minWidth: { xs: "100%", sm: "80%" } }}>
                                                             <LocalizationProvider dateAdapter={AdapterDayjs}>
                                                                 <DemoContainer components={["DatePicker"]} sx={{ mx: "10%", minWidth: "80%" }}>
                                                                     <DatePicker
@@ -540,7 +546,7 @@ function NewProject() {
                                                 </MDTypography>
                                                 <Grid container spacing={2} p={{ xs: 1, sm: 3 }}>
                                                     <Grid item xs={12} md={6} xl={6}>
-                                                        <MDBox sx={{ mx: { xs: 0, sm: "10%" }, minWidth: {xs:"100%", sm:"80%"} }}>
+                                                        <MDBox sx={{ mx: { xs: 0, sm: "10%" }, minWidth: { xs: "100%", sm: "80%" } }}>
                                                             <MDInput
                                                                 name="surface"
                                                                 type="number"
@@ -555,7 +561,7 @@ function NewProject() {
                                                     </Grid>
                                                     <Grid item xs={12} md={6} xl={6}>
                                                         <MDBox pr={1}>
-                                                            <FormControl required sx={{ mx: { xs: 0, sm: "10%" }, minWidth: {xs:"100%", sm:"80%"} }}>
+                                                            <FormControl required sx={{ mx: { xs: 0, sm: "10%" }, minWidth: { xs: "100%", sm: "80%" } }}>
                                                                 <InputLabel p={3}>Topologie </InputLabel>
                                                                 <Select sx={{ height: 44 }}
                                                                     value={topologie}
@@ -584,7 +590,7 @@ function NewProject() {
                                                 </MDTypography>
                                                 <Grid container spacing={2} p={{ xs: 1, sm: 3 }}>
                                                     <Grid item xs={12} md={6} xl={6}>
-                                                        <FormControl required sx={{ mx: { xs: 0, sm: "10%" }, minWidth: {xs:"100%", sm:"80%"} }}>
+                                                        <FormControl required sx={{ mx: { xs: 0, sm: "10%" }, minWidth: { xs: "100%", sm: "80%" } }}>
                                                             <InputLabel pl={3}>Type de maison </InputLabel>
                                                             <Select sx={{ height: 44 }}
                                                                 value={houseType}
@@ -599,7 +605,7 @@ function NewProject() {
                                                         </FormControl>
                                                     </Grid>
                                                     <Grid item xs={12} md={6} xl={6}>
-                                                        <FormControl required sx={{ mx: { xs: 0, sm: "10%" }, minWidth: {xs:"100%", sm:"80%"} }}>
+                                                        <FormControl required sx={{ mx: { xs: 0, sm: "10%" }, minWidth: { xs: "100%", sm: "80%" } }}>
                                                             <InputLabel pb={3}>Type de standing </InputLabel>
                                                             <Select sx={{ height: 44 }}
                                                                 value={standingType}
@@ -614,7 +620,7 @@ function NewProject() {
                                                         </FormControl>
                                                     </Grid>
                                                     <Grid item xs={12} md={6} xl={6}>
-                                                        <FormControl required sx={{ mx: { xs: 0, sm: "10%" }, minWidth: {xs:"100%", sm:"80%"} }}>
+                                                        <FormControl required sx={{ mx: { xs: 0, sm: "10%" }, minWidth: { xs: "100%", sm: "80%" } }}>
                                                             <InputLabel pb={3}>Garage </InputLabel>
                                                             <Select sx={{ height: 44 }}
                                                                 value={nbrCars}
@@ -629,7 +635,7 @@ function NewProject() {
                                                         </FormControl>
                                                     </Grid>
                                                     <Grid item xs={12} md={6} xl={6}>
-                                                        <FormControl required sx={{ mx: { xs: 0, sm: "10%" }, minWidth: {xs:"100%", sm:"80%"} }}>
+                                                        <FormControl required sx={{ mx: { xs: 0, sm: "10%" }, minWidth: { xs: "100%", sm: "80%" } }}>
                                                             <InputLabel pb={3}>Nombre de pi&eacute;ce </InputLabel>
                                                             <Select sx={{ height: 44 }}
                                                                 value={nbrRooms}
@@ -658,7 +664,7 @@ function NewProject() {
                                                 <MDTypography sx={{ mt: 2, mb: 3 }}>
                                                     Comment comptez-vous financier votre projet de construction?
                                                 </MDTypography>
-                                                <FormControl required sx={{ mx: { xs: 0, sm: "10%" }, minWidth: {xs:"100%",sm:"80%",md:"50%"} }}>
+                                                <FormControl required sx={{ mx: { xs: 0, sm: "10%" }, minWidth: { xs: "100%", sm: "80%", md: "50%" } }}>
                                                     <InputLabel sx={{ p: 0 }}>Financement </InputLabel>
                                                     <Select sx={{ height: 44 }}
                                                         value={funding}
