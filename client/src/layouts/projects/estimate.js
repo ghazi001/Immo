@@ -20,6 +20,8 @@ import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 import Perso from "./personalization";
 import MDSnackbar from "../../components/MDSnackbar";
+import { useMediaQuery } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 
 const ScrolingCard = styled(Card)(() => ({
     position: "absolute",
@@ -53,13 +55,17 @@ function Estimate() {
     const [loadingCorps, setLoadingCorps] = useState(true);
     const [corps, setCorps] = useState(null);
     const [open, setOpen] = useState(false);
+    const [openDetail, setOpenDetail] = useState(false);
     const handleOpen = () => setOpen(true);
+    const handleOpenDetail = () => setOpenDetail(true);
     const [piecesList, setPiecesList] = useState([]);
     const [constructionList, setConstructionList] = useState([]);
     const [standingList, setStandingList] = useState([]);
     const [garageList, setGarageList] = useState([]);
     const [warningSB, setWarningSB] = useState(false);
     const closeWarningSB = () => setWarningSB(false);
+    const theme = useTheme();
+    const phoneConsole = useMediaQuery(theme.breakpoints.down("sm"));
 
     useEffect(() => {
         if (!currentUser)
@@ -133,10 +139,71 @@ function Estimate() {
             aria-labelledby="modal-modal-title"
             aria-describedby="modal-modal-description"
         >
-            <ScrolingCard sx={{ width: { xs: "100%", sm: "50%"} }} >
+            <ScrolingCard sx={{ width: { xs: "100%", sm: "50%" } }} >
                 <Perso project={project} setProject={setProject} piecesList={piecesList} setBudget={setBudget} setCorps={setCorps}
                     constructionList={constructionList} standingList={standingList} garageList={garageList} setOpen={setOpen} setWarningSB={setWarningSB}
                 />
+            </ScrolingCard>
+        </Modal >
+    );
+
+    const renderModalDetail = (
+        <Modal
+            open={openDetail}
+            aria-labelledby="modal-modal-title"
+            aria-describedby="modal-modal-description"
+        >
+            <ScrolingCard sx={{ width: { xs: "100%", sm: "50%" } }} >
+                <Grid item xs={12} md={12} xl={12} textAlign="center">
+                    <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ fontSize: 14, float: "left", my: 2 }}>
+                        D&eacute;tails par corps d&apos;&eacute;tat
+                    </Typography>
+                    {(loadingCorps) ?
+                        (
+                            <Box align="center" sx={{ my: 3 }} >
+                                < CircularProgress disableShrink={true} />
+                                <MDTypography mb={2} color="primary" fontSize={15} >
+                                    chargement des donn&eacute;es
+                                </MDTypography>
+                            </Box>
+                        ) : (
+                            <>
+                                <TableContainer component={Paper} sx={{ mt: 2, maxHeight: 500 }}>
+                                    <Table aria-label="spanning table">
+                                        <TableRow>
+                                            <TableCell sx={{ fontSize: 14, fontWeight:500 }}>Min</TableCell>
+                                            <TableCell sx={{ fontSize: 14, fontWeight: 500 }}>Budget estim&eacute;</TableCell>
+                                            <TableCell sx={{ fontSize: 14, fontWeight: 500 }}>Max</TableCell>
+                                        </TableRow>
+                                            {corps && corps.map((corp, index) => (
+                                                <>
+
+                                                    <TableRow key={index}>
+                                                        <TableCell sx={{ borderBottom: "none", pb:0 }} colSpan={3}>
+                                                            <b style={{ fontSize: 14 }}>{corp.LABEL}</b><br />
+                                                        </TableCell>
+                                                    </TableRow>
+                                                    <TableRow key={index}>
+                                                        <TableCell sx={{ fontSize: 12 }}>
+                                                            {corp.Min}
+                                                        </TableCell>
+                                                        <TableCell sx={{ fontSize: 12 }}>
+                                                            {Object.values(corp)[Object.keys(corp).findIndex(x => x.startsWith("Budget"))]}
+                                                        </TableCell>
+                                                        <TableCell sx={{ fontSize: 12 }}>
+                                                            {corp.Max}
+                                                        </TableCell>
+                                                    </TableRow>
+                                                </>
+                                            ))}
+                                    </Table>
+                                </TableContainer>
+                                <MDButton variant="gradient" color="success" sx={{ mt: 2 }} onClick={() => setOpenDetail(false)}>
+                                    Terminer
+                                </MDButton>
+                            </>
+                        )}
+                </Grid>
             </ScrolingCard>
         </Modal >
     );
@@ -171,25 +238,29 @@ function Estimate() {
                                         </Box>
                                     ) : (
                                         <>
-                                            <Grid item xs={12} md={12} xl={12} pr={3} mb={2}>
-                                                <Typography id="modal-modal-title" variant="h6" component="h2">
+                                            <Grid item xs={12} md={12} xl={12} pr={{ xs: 0, md: 3 }} mb={2}>
+                                                <MDTypography id="modal-modal-title" sx={{ fontSize: { xs: 15, md: 17 }, fontWeight: 700 }}>
                                                     Estimation du projet
-                                                </Typography>
-                                                <MDButton variant="contained" color="primary" sx={{ float: "right", marginTop: 3, padding: 1 }} onClick={handleOpen} focus={false}>
-                                                    Personnaliser
-                                                </MDButton>
-                                                <Typography id="modal-modal-description" sx={{ mt: 2, fontSize: 14, ml: 3 }} component="h6">
+                                                </MDTypography>
+                                                <Typography id="modal-modal-description" sx={{ mt: 2, fontSize: 14, ml: { xs: 0, sm: 1, md: 3 } }} component="h6">
                                                     <b>Notre proposition:</b>
                                                     <br />
                                                     {project.typeMaisonLabel} de {project.nbrPiece} Pi&eacute;ce(s) {project.typeStandingLabel} avec une surface utile de {parseFloat(project.surfaceUtile)} m&sup2;
                                                     <br />
                                                     Garage: {project.garage}
+                                                    <MDButton variant="contained" color="primary" sx={{ display: { xs: "none", sm: "block" }, position: "absolute", top: 0, right: 0, margin: 3 }} onClick={handleOpen} focus={false}>
+                                                        Personnaliser
+                                                    </MDButton>
+                                                    <MDTypography sx={{ display: { xs: "block", sm: "none" }, color: "red", position: "sticky", float: "right", fontWeight: 700 }} fontSize={15} onClick={handleOpen}>
+                                                        Personnaliser
+                                                    </MDTypography>
                                                 </Typography>
+
                                             </Grid>
                                             <Grid item xs={12} md={12} xl={12}>
-                                                <Typography id="modal-modal-title" variant="h6" component="h2">
-                                                    Estimation du budget de construction:
-                                                </Typography>
+                                                <MDTypography id="modal-modal-title" sx={{ fontSize: { xs: 15, md: 17 }, fontWeight: 700 }}>
+                                                    Estimation du budget de construction
+                                                </MDTypography>
                                                 {(loadingBudget) ?
                                                     (
                                                         <Box align="center" sx={{ my: 3 }} >
@@ -199,25 +270,60 @@ function Estimate() {
                                                             </MDTypography>
                                                         </Box>
                                                     ) : (
-                                                        <TableContainer component={Paper} sx={{ width: "max-content", my: 2 }}>
-                                                            <Table>
-                                                                <TableRow>
-                                                                    <TableCell align="center" sx={{ fontWeight: 500 }}>Min</TableCell>
-                                                                    <TableCell align="center" sx={{ fontWeight: 500 }}>Budget estim&eacute;</TableCell>
-                                                                    <TableCell align="center" sx={{ fontWeight: 500 }}>Max</TableCell>
-                                                                </TableRow>
-                                                                <TableRow
-                                                                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                                                                >
-                                                                    <TableCell align="center">{budget != null ? budget.Min : 0}</TableCell>
-                                                                    <TableCell align="center">{budget != null ? Object.values(budget)[Object.keys(budget).findIndex(x => x.startsWith("Budget"))] : 0}</TableCell>
-                                                                    <TableCell align="center">{budget != null ? budget.max : 0}</TableCell>
-                                                                </TableRow>
-                                                            </Table>
-                                                        </TableContainer>
+                                                        <>
+                                                            {phoneConsole ?
+                                                                (
+                                                                    <div>
+                                                                        <MDTypography sx={{ display: { xs: "block", sm: "none" }, color: "red", position: "sticky", float: "right", fontWeight: 500 }} fontSize={15} onClick={handleOpenDetail}>
+                                                                            D&eacute;tailler
+                                                                        </MDTypography>
+                                                                        <TableContainer component={Paper} sx={{ width: "max-content", mt:3  }}>
+                                                                            <Table>
+                                                                                <TableRow>
+                                                                                    <TableCell align="left" sx={{ fontWeight: 500 }}>Min</TableCell>
+                                                                                    <TableCell align="center">{budget != null ? budget.Min : 0}</TableCell>
+                                                                                </TableRow>
+                                                                                <TableRow
+                                                                                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                                                                                >
+                                                                                    <TableCell align="left" sx={{ fontWeight: 500 }}>Budget estim&eacute;</TableCell>
+                                                                                    <TableCell align="center">{budget != null ? Object.values(budget)[Object.keys(budget).findIndex(x => x.startsWith("Budget"))] : 0}</TableCell>
+                                                                                </TableRow>
+                                                                                <TableRow
+                                                                                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                                                                                >
+                                                                                    <TableCell align="left" sx={{ fontWeight: 500 }}>Max</TableCell>
+                                                                                    <TableCell align="center">{budget != null ? budget.max : 0}</TableCell>
+                                                                                </TableRow>
+                                                                            </Table>
+                                                                        </TableContainer>
+                                                                    </div>
+                                                                ) : (
+                                                                    <>
+                                                                        <TableContainer component={Paper} sx={{ width: "max-content", my: 2 }}>
+                                                                            <Table>
+                                                                                <TableRow>
+                                                                                    <TableCell align="center" sx={{ fontWeight: 500 }}>Min</TableCell>
+                                                                                    <TableCell align="center" sx={{ fontWeight: 500 }}>Budget estim&eacute;</TableCell>
+                                                                                    <TableCell align="center" sx={{ fontWeight: 500 }}>Max</TableCell>
+                                                                                </TableRow>
+                                                                                <TableRow
+                                                                                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                                                                                >
+                                                                                    <TableCell align="center">{budget != null ? budget.Min : 0}</TableCell>
+                                                                                    <TableCell align="center">{budget != null ? Object.values(budget)[Object.keys(budget).findIndex(x => x.startsWith("Budget"))] : 0}</TableCell>
+                                                                                    <TableCell align="center">{budget != null ? budget.max : 0}</TableCell>
+                                                                                </TableRow>
+                                                                            </Table>
+                                                                        </TableContainer>
+                                                                    </>
+                                                                )
+                                                            }
+                                                        </>
+
                                                     )}
                                             </Grid>
-                                            <Grid item xs={12} md={12} xl={12}>
+                                            <Grid item xs={12} md={12} xl={12} sx={{ display: { xs: "none", sm: "block" } }}>
                                                 <Typography id="modal-modal-title" variant="h6" component="h2">
                                                     D&eacute;tails par corps d&apos;&eacute;tat
                                                 </Typography>
@@ -266,6 +372,7 @@ function Estimate() {
                         </Grid >
                     </Grid >
                     {renderModalPerso}
+                    {renderModalDetail}
                 </Card >
             </MDBox >
             {renderWarningSB}

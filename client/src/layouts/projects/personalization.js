@@ -15,6 +15,7 @@ import MDTypography from "../../components/MDTypography";
 import MDInput from "../../components/MDInput";
 import axios from "axios";
 import { AuthContext } from "context/authContext";
+import { Padding } from "@mui/icons-material";
 
 
 const TableHead = withStyles((theme) => ({
@@ -50,6 +51,8 @@ function Perso({ project, setProject, garageList, standingList, setBudget, setCo
     const [pieceLabel, setPieceLabel] = useState("");
     const [listPerso, setListPers] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [maxNBPS, setMaxNBPS] = useState(0);
+    const [error, setError] = useState(null);
 
     const [inputs, setInputs] = useState({
         houseType: project.typeMaison,
@@ -58,6 +61,7 @@ function Perso({ project, setProject, garageList, standingList, setBudget, setCo
     });
 
     const handleChange = async (e) => {
+        setError(null);
         setInputs((prev) => ({ ...prev, [e.target.name]: e.target.value }));
         var updatedProject = project;
         switch (e.target.name) {
@@ -96,6 +100,7 @@ function Perso({ project, setProject, garageList, standingList, setBudget, setCo
 
 
     const handleAddPerso = async () => {
+        setError(null);
         if (surface > 0 && nombre > 0 && piece != "") {
             const newPerso = {
                 id: 0,
@@ -106,19 +111,27 @@ function Perso({ project, setProject, garageList, standingList, setBudget, setCo
             };
 
             var list = listPerso;
-            list.push(newPerso);
-            setListPers(list);
             var updatedProject = project;
-            if (CalculatedPieces.includes(piece)) {
-                setNombrePiece(parseInt(nombrePiece) + parseInt(nombre));
-                updatedProject.nbrPiece = parseInt(nombrePiece) + parseInt(nombre);
-            }
-            updatedProject.surfaceUtile += parseFloat(nombre * surface);
-            setProject(updatedProject);
             setSurface(0);
             setNombre(0);
             setPiece("");
             setPieceLabel("");
+
+            if (CalculatedPieces.includes(piece)) {
+                if ((parseInt(nombrePiece) + parseInt(nombre)) > maxNBPS) {
+                    setError("(*) Le nombre de pi\u00e8ces de votre projet (nombre de s\u00e9jours + nombre de SAM + nombre de chambres + nombre de bureau) doit \u00eatre inf\u00e9rieur ou \u00e9gal \u00e0 " + maxNBPS);
+                    return;
+                }
+                else {
+                    setNombrePiece(parseInt(nombrePiece) + parseInt(nombre));
+                    updatedProject.nbrPiece = parseInt(nombrePiece) + parseInt(nombre);
+                }
+            }
+            list.push(newPerso);
+            setListPers(list);
+            updatedProject.surfaceUtile += parseFloat(nombre * surface);
+            setProject(updatedProject);
+           
             if (project.id != undefined) {
                 try {
                     await axios.post(`${url}/api/projects/addPerso?projectId=${project.id}`, list);
@@ -149,6 +162,7 @@ function Perso({ project, setProject, garageList, standingList, setBudget, setCo
     };
 
     const handleRemovePerso = async (indice) => {
+        setError(null);
         var list = listPerso;
         var updatedProject = project;
         if (CalculatedPieces.includes(list[indice].piece)) {
@@ -187,6 +201,11 @@ function Perso({ project, setProject, garageList, standingList, setBudget, setCo
 
 
     useEffect(() => {
+        fetch(`${url}/api/data/getNombreDePieces`)
+            .then((res) => res.json())
+            .then((data) => {
+                setMaxNBPS(Math.max(...data.map(({ NBPCS }) => NBPCS)));
+            });
         fetch(`${url}/api/projects/getPerso?projectId=${project.id}`)
             .then((res) => res.json())
             .then((data) => {
@@ -312,6 +331,11 @@ function Perso({ project, setProject, garageList, standingList, setBudget, setCo
                 </Grid>
 
             </Grid>
+            {error &&
+                <MDTypography mb={2} mt={1} color="error" fontSize={13}>
+                    {error}
+                </MDTypography>
+            }
             <TableContainer component={Paper}>
                 <Table aria-label="customized table" loading={loading}>
                     <TableHead>
@@ -345,7 +369,7 @@ function Perso({ project, setProject, garageList, standingList, setBudget, setCo
                                 <TableCell align="left">{perso.pieceLabel}</TableCell>
                                 <TableCell align="left">{perso.surface}</TableCell>
                                 <TableCell align="left">{perso.nombre}</TableCell>
-                                <TableCell align="center">
+                                <TableCell align="center" sx={{ padding: { xs: 0, sm:"0.75rem 1rem" } }}>
                                     <MDButton variant="gradient" size="small" sx={{ margin: "0 2px" }} color="error" onClick={() => { handleRemovePerso(indice) }} iconOnly>
                                         <Icon>delete</Icon>
                                     </MDButton>
