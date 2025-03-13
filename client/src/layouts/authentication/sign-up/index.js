@@ -13,7 +13,7 @@ import MDSnackbar from "../../../components/MDSnackbar";
 import { AuthContext } from "../../../context/authContext";
 
 const Register = () => {
-    const { url } = useContext(AuthContext);
+    const { signUp } = useContext(AuthContext);
     const [successSB, setSuccessSB] = useState(false);
     const [errorSB, setErrorSB] = useState(false);
     const navigate = useNavigate();
@@ -33,17 +33,17 @@ const Register = () => {
         window.location.replace(window.location.origin + "/authentication/sign-in");
     };
     const closeErrorSB = () => setErrorSB(false);
-    const handleClick = async (e) => {
+
+    const handleSignUp = async (e) => {
         e.preventDefault();
         try {
-            var res = await axios.post(`${url}/api/auth/register`, inputs);
-            setSuccessSB(true);
-            navigate("/authentication/sign-in");
+            await signUp(inputs);
         } catch (err) {
             setErr(err.response == undefined ? "Probléme de connexion au BD" : err.response.data);
             setErrorSB(true);
         }
     };
+
     const renderSuccessSB = (
         <MDSnackbar
             color="success"
@@ -135,7 +135,7 @@ const Register = () => {
                                 />
                             </MDBox>
                             <MDBox mt={4} mb={1}>
-                                <MDButton variant="gradient" color="info" onClick={handleClick} fullWidth>
+                                <MDButton variant="gradient" color="info" onClick={handleSignUp} fullWidth>
                                     Cr&eacute;er votre compte
                                 </MDButton>
                             </MDBox>

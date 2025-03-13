@@ -174,7 +174,7 @@ function Projects() {
                                             </MDButton>
                                             <MDBox position="relative" width="100%" shadow="xl" borderRadius="xl">
                                                 <CardMedia
-                                                    src={project.lTypeMaison == "Triplex" ? triplexImg : project.lTypeMaison == "Duplex" ? duplexImg : houseImg}
+                                                    src={project.typeMaison == "TRX" ? triplexImg : project.typeMaison == "DUX" ? duplexImg : houseImg}
                                                     component="img"
                                                     title={parseFloat(project.surfaceUtile) + "m\u00b2, " + project.estimation}
                                                     sx={{

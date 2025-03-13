@@ -32,10 +32,10 @@ import backgroundImage from "assets/images/Immo.jpg";
 
 
 function NewProject() {
-    const { currentUser, isLogIn, url, setNewProject } = useContext(AuthContext);
+    const { currentUser, url, setNewProject } = useContext(AuthContext);
     const navigate = useNavigate();
     const handleNavigate = () => { funding == null ? setErr(true) : handleOpen() };
-    const [activeStep, setActiveStep] = useState(isLogIn ? 4 : 0);
+    const [activeStep, setActiveStep] = useState(0);
     const [err, setErr] = useState(false);
     const [ville, setVille] = useState(JSON.parse(localStorage.getItem("ville")) || null);
     const [villes, setVilles] = useState(null);
