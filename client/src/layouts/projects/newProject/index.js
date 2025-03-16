@@ -236,6 +236,7 @@ function NewProject() {
 
     useEffect(() => {
         try {
+            Initialize();
             fetch(`${url}/api/data/getNombreDePieces`)
                 .then((res) => res.json())
                 .then((data) => {

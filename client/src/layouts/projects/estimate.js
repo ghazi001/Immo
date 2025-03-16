@@ -77,6 +77,7 @@ function Estimate() {
             if (res.status == 200) {
                 updatedProject.devise = devise;
                 setProject(updatedProject);
+                setDevise(devise);
                 try {
                     fetch(`${url}/api/projects/getEstimationByIdProject?idProject=${project.id}`)
                         .then((res) => res.json())
@@ -206,31 +207,31 @@ function Estimate() {
                                 <TableContainer component={Paper} sx={{ mt: 2, maxHeight: 500 }}>
                                     <Table aria-label="spanning table">
                                         <TableRow>
-                                            <TableCell sx={{ fontSize: 14, fontWeight:500 }}>Min</TableCell>
+                                            <TableCell sx={{ fontSize: 14, fontWeight: 500 }}>Min</TableCell>
                                             <TableCell sx={{ fontSize: 14, fontWeight: 500 }}>Budget estim&eacute;</TableCell>
                                             <TableCell sx={{ fontSize: 14, fontWeight: 500 }}>Max</TableCell>
                                         </TableRow>
-                                            {corps && corps.map((corp, index) => (
-                                                <>
+                                        {corps && corps.map((corp, index) => (
+                                            <>
 
-                                                    <TableRow key={index}>
-                                                        <TableCell sx={{ borderBottom: "none", pb:0 }} colSpan={3}>
-                                                            <b style={{ fontSize: 14 }}>{corp.LABEL}</b><br />
-                                                        </TableCell>
-                                                    </TableRow>
-                                                    <TableRow key={index}>
-                                                        <TableCell sx={{ fontSize: 12 }}>
-                                                            {corp.Min}
-                                                        </TableCell>
-                                                        <TableCell sx={{ fontSize: 12 }}>
-                                                            {Object.values(corp)[Object.keys(corp).findIndex(x => x.startsWith("Budget"))]}
-                                                        </TableCell>
-                                                        <TableCell sx={{ fontSize: 12 }}>
-                                                            {corp.Max}
-                                                        </TableCell>
-                                                    </TableRow>
-                                                </>
-                                            ))}
+                                                <TableRow key={index}>
+                                                    <TableCell sx={{ borderBottom: "none", pb: 0 }} colSpan={3}>
+                                                        <b style={{ fontSize: 14 }}>{corp.LABEL}</b><br />
+                                                    </TableCell>
+                                                </TableRow>
+                                                <TableRow key={index}>
+                                                    <TableCell sx={{ fontSize: 12 }}>
+                                                        {corp.Min}
+                                                    </TableCell>
+                                                    <TableCell sx={{ fontSize: 12 }}>
+                                                        {Object.values(corp)[Object.keys(corp).findIndex(x => x.startsWith("Budget"))]}
+                                                    </TableCell>
+                                                    <TableCell sx={{ fontSize: 12 }}>
+                                                        {corp.Max}
+                                                    </TableCell>
+                                                </TableRow>
+                                            </>
+                                        ))}
                                     </Table>
                                 </TableContainer>
                                 <MDButton variant="gradient" color="success" sx={{ mt: 2 }} onClick={() => setOpenDetail(false)}>
@@ -274,18 +275,18 @@ function Estimate() {
                                     ) : (
                                         <>
                                             <Grid item xs={12} md={12} xl={12} pr={{ xs: 0, md: 3 }} mb={2}>
-                                                <MDTypography id="modal-modal-title" sx={{ display:"flex", fontSize: { xs: 15, md: 17 }, fontWeight: 700 }}>
+                                                <MDTypography id="modal-modal-title" sx={{ display: "flex", fontSize: { xs: 15, md: 17 }, fontWeight: 700 }}>
                                                     Estimation du projet
                                                     <Grid>
                                                         <Select
                                                             value={devise}
                                                             onChange={handleChangeDevise}
                                                             sx={{ marginLeft: "50%" }} >
-                                                        {devises.map((dvs) => (
-                                                            <MenuItem key={dvs} value={dvs}>
-                                                                {dvs}
-                                                            </MenuItem>
-                                                        ))}
+                                                            {devises.map((dvs) => (
+                                                                <MenuItem key={dvs} value={dvs}>
+                                                                    {dvs}
+                                                                </MenuItem>
+                                                            ))}
                                                         </Select>
                                                     </Grid>
                                                 </MDTypography>
@@ -324,23 +325,23 @@ function Estimate() {
                                                                         <MDTypography sx={{ display: { xs: "block", sm: "none" }, color: "red", position: "sticky", float: "right", fontWeight: 500 }} fontSize={15} onClick={handleOpenDetail}>
                                                                             D&eacute;tailler
                                                                         </MDTypography>
-                                                                        <TableContainer component={Paper} sx={{ width: "max-content", mt:3  }}>
+                                                                        <TableContainer component={Paper} sx={{ width: "max-content", mt: 3 }}>
                                                                             <Table>
                                                                                 <TableRow>
-                                                                                    <TableCell align="left" sx={{ fontWeight: 500 }}>Min</TableCell>
-                                                                                    <TableCell align="center">{budget != null ? budget.Min : 0}</TableCell>
+                                                                                    <TableCell align="left" sx={{ fontWeight: 500, fontSize: 14 }}>Min</TableCell>
+                                                                                    <TableCell align="center" sx={{ fontSize: 14 }}>{budget != null ? budget.Min + " " + (devise == "EUR" ? "\u20AC" : devise == "USD" ? "\u0024" : "FCFA") : 0}</TableCell>
                                                                                 </TableRow>
                                                                                 <TableRow
                                                                                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                                                                 >
-                                                                                    <TableCell align="left" sx={{ fontWeight: 500 }}>Budget estim&eacute;</TableCell>
-                                                                                    <TableCell align="center">{budget != null ? Object.values(budget)[Object.keys(budget).findIndex(x => x.startsWith("Budget"))] : 0}</TableCell>
+                                                                                    <TableCell align="left" sx={{ fontWeight: 500, fontSize: 14 }}>Budget estim&eacute;</TableCell>
+                                                                                    <TableCell align="center" sx={{ fontSize: 14 }}>{budget != null ? Object.values(budget)[Object.keys(budget).findIndex(x => x.startsWith("Budget"))] + " " + (devise == "EUR" ? "\u20AC" : devise == "USD" ? "\u0024" : "FCFA") : 0}</TableCell>
                                                                                 </TableRow>
                                                                                 <TableRow
                                                                                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                                                                 >
-                                                                                    <TableCell align="left" sx={{ fontWeight: 500 }}>Max</TableCell>
-                                                                                    <TableCell align="center">{budget != null ? budget.max : 0}</TableCell>
+                                                                                    <TableCell align="left" sx={{ fontWeight: 500, fontSize: 14 }}>Max</TableCell>
+                                                                                    <TableCell align="center" sx={{ fontSize: 14 }}>{budget != null ? budget.max + " " + (devise == "EUR" ? "\u20AC" : devise == "USD" ? "\u0024" : "FCFA") : 0}</TableCell>
                                                                                 </TableRow>
                                                                             </Table>
                                                                         </TableContainer>
@@ -357,9 +358,9 @@ function Estimate() {
                                                                                 <TableRow
                                                                                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                                                                 >
-                                                                                    <TableCell align="center">{budget != null ? budget.Min : 0}</TableCell>
-                                                                                    <TableCell align="center">{budget != null ? Object.values(budget)[Object.keys(budget).findIndex(x => x.startsWith("Budget"))] : 0}</TableCell>
-                                                                                    <TableCell align="center">{budget != null ? budget.max : 0}</TableCell>
+                                                                                    <TableCell align="center">{budget != null ? budget.Min + " " + (devise == "EUR" ? "\u20AC" : devise == "USD" ? "\u0024" : "FCFA") : 0}</TableCell>
+                                                                                    <TableCell align="center">{budget != null ? Object.values(budget)[Object.keys(budget).findIndex(x => x.startsWith("Budget"))] + " " + (devise == "EUR" ? "\u20AC" : devise == "USD" ? "\u0024" : "FCFA") : 0}</TableCell>
+                                                                                    <TableCell align="center">{budget != null ? budget.max + " " + (devise == "EUR" ? "\u20AC" : devise == "USD" ? "\u0024" : "FCFA") : 0}</TableCell>
                                                                                 </TableRow>
                                                                             </Table>
                                                                         </TableContainer>
