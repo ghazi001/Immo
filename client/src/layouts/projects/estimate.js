@@ -2,7 +2,7 @@ import { useState, useEffect, useContext } from "react";
 import { styled } from '@mui/material/styles';
 import axios from "axios";
 import { useParams } from 'react-router-dom';
-import { Box, CircularProgress, Modal, Typography } from "@mui/material";
+import { Box, CircularProgress, MenuItem, Modal, Select, Typography } from "@mui/material";
 import MDButton from "components/MDButton";
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
@@ -22,6 +22,7 @@ import Perso from "./personalization";
 import MDSnackbar from "../../components/MDSnackbar";
 import { useMediaQuery } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
+import { devises } from "./newProject/common.tsx";
 
 const ScrolingCard = styled(Card)(() => ({
     position: "absolute",
@@ -63,9 +64,42 @@ function Estimate() {
     const [standingList, setStandingList] = useState([]);
     const [garageList, setGarageList] = useState([]);
     const [warningSB, setWarningSB] = useState(false);
+    const [devise, setDevise] = useState("FCFA");
     const closeWarningSB = () => setWarningSB(false);
     const theme = useTheme();
     const phoneConsole = useMediaQuery(theme.breakpoints.down("sm"));
+
+    const handleChangeDevise = async (event: SelectChangeEvent) => {
+        let devise = event.target.value;
+        let updatedProject = project;
+        try {
+            const res = await axios.post(`${url}/api/projects/updateDevise?projectId=${project.id}&devise=${devise}`);
+            if (res.status == 200) {
+                updatedProject.devise = devise;
+                setProject(updatedProject);
+                try {
+                    fetch(`${url}/api/projects/getEstimationByIdProject?idProject=${project.id}`)
+                        .then((res) => res.json())
+                        .then((data) => {
+                            setBudget(data[0]);
+                        });
+                } catch (Exception) {
+                    setBudget(null);
+                }
+                try {
+                    fetch(`${url}/api/projects/detailCorpEtatByIdProject?projectId=${project.id}`)
+                        .then((res) => res.json())
+                        .then((data) => {
+                            setCorps(data);
+                        });
+                } catch (Exception) {
+                    setCorps(null);
+                }
+            }
+        } catch (err) {
+        }
+
+    };
 
     useEffect(() => {
         if (!currentUser)
@@ -75,6 +109,7 @@ function Estimate() {
                 axios.get(`${url}/api/projects/getProjectByUserId?projectId=${id}&userId=${currentUser.id}`)
                     .then((res) => {
                         setProject(res.data);
+                        setDevise(res.data.devise ?? "FCFA");
                         setLoading(false);
                     });
 
@@ -239,8 +274,20 @@ function Estimate() {
                                     ) : (
                                         <>
                                             <Grid item xs={12} md={12} xl={12} pr={{ xs: 0, md: 3 }} mb={2}>
-                                                <MDTypography id="modal-modal-title" sx={{ fontSize: { xs: 15, md: 17 }, fontWeight: 700 }}>
+                                                <MDTypography id="modal-modal-title" sx={{ display:"flex", fontSize: { xs: 15, md: 17 }, fontWeight: 700 }}>
                                                     Estimation du projet
+                                                    <Grid>
+                                                        <Select
+                                                            value={devise}
+                                                            onChange={handleChangeDevise}
+                                                            sx={{ marginLeft: "50%" }} >
+                                                        {devises.map((dvs) => (
+                                                            <MenuItem key={dvs} value={dvs}>
+                                                                {dvs}
+                                                            </MenuItem>
+                                                        ))}
+                                                        </Select>
+                                                    </Grid>
                                                 </MDTypography>
                                                 <Typography id="modal-modal-description" sx={{ mt: 2, fontSize: 14, ml: { xs: 0, sm: 1, md: 3 } }} component="h6">
                                                     <b>Notre proposition:</b>

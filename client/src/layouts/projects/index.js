@@ -76,7 +76,7 @@ function Projects() {
         if (!currentUser)
             navigate("/nouveau-projet")
         else {
-            fetch(`${url}/api/projects/list?userId=${currentUser.id}`)
+            fetch(`${url}/api/projects/getProjectsByUserIdNew?userId=${currentUser.id}`)
                 .then((res) => res.json())
                 .then((data) => {
                     setProjects(data);
@@ -176,7 +176,6 @@ function Projects() {
                                                 <CardMedia
                                                     src={project.typeMaison == "TRX" ? triplexImg : project.typeMaison == "DUX" ? duplexImg : houseImg}
                                                     component="img"
-                                                    title={parseFloat(project.surfaceUtile) + "m\u00b2, " + project.estimation}
                                                     sx={{
                                                         maxWidth: "100%",
                                                         margin: 0,
@@ -196,7 +195,7 @@ function Projects() {
                                                         variant="h5"
                                                         textTransform="capitalize"
                                                     >
-                                                        {parseFloat(project.surfaceUtile) + "m\u00b2, " + project.estimation}
+                                                        {parseFloat(project.surfaceUtile) + "m\u00b2, " + Math.round(project.estimation) + " " + (project.devise == "EUR" ? "\u20AC" : project.devise == "USD" ? "\u0024" : "FCFA")}
                                                     </MDTypography>
                                                 </MDBox>
                                                 <MDBox mb={3} lineHeight={0}>

@@ -82,3 +82,5 @@ export const styleModal = {
     boxShadow: 24,
     p: 4,
 };
+
+export const devises = ["EUR","USD" ,"FCFA"];

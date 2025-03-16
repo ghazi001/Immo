@@ -76,12 +76,18 @@ function NewProject() {
         localStorage.setItem("commune", JSON.stringify(null));
         localStorage.setItem("quarter", JSON.stringify(null));
         localStorage.setItem("zone", JSON.stringify(null));
+        localStorage.setItem("otherQuarter", JSON.stringify(null));
+        localStorage.setItem("otherZone", JSON.stringify(null));
         setVille(ville);
         setCommune(null);
         setQuarter(null);
         setQuarters(null);
         setZone(null);
         setZones(null);
+        setIsOtherQuarter(false);
+        setIsOtherZone(false);
+        setOtherZone(null);
+        setOtherQuarter(null);
         fetch(`${url}/api/data/communes?villeId=${ville.id}`)
             .then((res) => res.json())
             .then((data) => {
@@ -94,9 +100,17 @@ function NewProject() {
         localStorage.setItem("commune", JSON.stringify(commune));
         localStorage.setItem("quarter", JSON.stringify(null));
         localStorage.setItem("zone", JSON.stringify(null));
+        localStorage.setItem("otherQuarter", JSON.stringify(null));
+        localStorage.setItem("otherZone", JSON.stringify(null));
+
         setCommune(commune);
         setQuarter(null);
         setZone(null);
+        setIsOtherQuarter(false);
+        setIsOtherZone(false);
+        setOtherZone(null);
+        setOtherQuarter(null);
+        setZones(null);
         fetch(`${url}/api/data/quarters?communeId=${commune.id}`)
             .then((res) => res.json())
             .then((data) => {
@@ -362,14 +376,23 @@ function NewProject() {
                             px: 2,
                         }}>
                             <MDBox sx={{ width: "100%" }} p={0}>
-                                <Stepper activeStep={activeStep} style={{ height: 10, display: "flex" }}>
+                                <Stepper
+                                    activeStep={activeStep}
+                                    sx={{
+                                        "& .MuiStepConnector-line": {
+                                            display: "none"
+                                        },
+                                        height: "auto", display: "flex", flexDirection: "column", flexFlow: "wrap", p: { xs: 0, sm: "10px 0" }
+                                    }}
+                                    orientation="horizontal"
+                                >
                                     {steps.map((label, index) => {
                                         const stepProps: { completed?: boolean } = {};
                                         const labelProps: {
                                             optional?: React.ReactNode,
                                         } = {};
                                         return (
-                                            <Step key={label} {...stepProps}>
+                                            <Step key={label} {...stepProps} sx={{ width: { xs: "50%", md: "20%" } }} >
                                                 <StepLabel {...labelProps}>{label}</StepLabel>
                                             </Step>
                                         );
