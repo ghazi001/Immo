@@ -32,13 +32,14 @@ function Overview() {
     const [errorMessage, setErrorMessage] = useState(null);
 
     const [inputs, setInputs] = useState({
-        username: currentUser.username,
+        id: currentUser.id,
         email: currentUser.email,
-        name: currentUser.name,
+        lastName: currentUser.lastName,
+        firstName: currentUser.firstName,
     });
 
     const [passwords, setPasswords] = useState({
-        username: currentUser.username,
+        id: currentUser.id,
         oldPassword: "",
         newPassword: "",
         confirmPassword: "",
@@ -70,7 +71,7 @@ function Overview() {
             setSuccess("Votre mot de passe a été changé avec succées!");
             setSuccessSB(true);
         } catch (err) {
-            setErr(err.response == undefined ? "Probléme de connexion au BD" : err.response.data);
+            setErr(err.response == undefined ? "Probléme de connexion au BD" : err.response.data.error);
             setErrorSB(true);
         }
     };
@@ -141,18 +142,18 @@ function Overview() {
                                                             <MDBox>
                                                                 <MDBox display="flex" py={1} pr={2}>
                                                                     <MDTypography variant="button" fontWeight="bold" textTransform="capitalize">
-                                                                        nom d&apos; utilisateur: &nbsp;
+                                                                        nom: &nbsp;
                                                                     </MDTypography>
                                                                     <MDTypography variant="button" fontWeight="regular" color="text">
-                                                                        &nbsp;{currentUser.username}
+                                                                        &nbsp;{currentUser.lastName}
                                                                     </MDTypography>
                                                                 </MDBox>
                                                                 <MDBox display="flex" py={1} pr={2}>
                                                                     <MDTypography variant="button" fontWeight="bold" textTransform="capitalize">
-                                                                        nom et prénom: &nbsp;
+                                                                        prénom: &nbsp;
                                                                     </MDTypography>
                                                                     <MDTypography variant="button" fontWeight="regular" color="text">
-                                                                        &nbsp;{currentUser.name}
+                                                                        &nbsp;{currentUser.firstName}
                                                                     </MDTypography>
                                                                 </MDBox>
                                                                 <MDBox display="flex" py={1} pr={2}>
@@ -182,10 +183,20 @@ function Overview() {
                                                             <MDBox component="form" role="form">
                                                                 <MDBox mb={2}>
                                                                     <MDInput
-                                                                        name="name"
+                                                                        name="lastName"
                                                                         type="text"
-                                                                        label="Nom et pr&eacute;nom"
-                                                                        value={inputs.name}
+                                                                        label="Nom"
+                                                                        value={inputs.lastName}
+                                                                        variant="standard"
+                                                                        onChange={handleChangeInfo}
+                                                                        fullWidth
+                                                                    />
+                                                                    <Divider />
+                                                                    <MDInput
+                                                                        name="firstName"
+                                                                        type="text"
+                                                                        label="Pr&eacute;nom"
+                                                                        value={inputs.firstName}
                                                                         variant="standard"
                                                                         onChange={handleChangeInfo}
                                                                         fullWidth

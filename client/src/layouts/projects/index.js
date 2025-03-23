@@ -187,15 +187,16 @@ function Projects() {
                                             </MDBox>
                                             <MDBox mt={1} mx={0.5}>
                                                 <MDTypography variant="button" fontWeight="regular" color="text" textTransform="capitalize">
-                                                    {project.typeMaisonLabel}, {project.typeStandingLabel}
+                                                    {project.typeMaisonLabel}, {project.nbrPiece} P, {project.typeStandingLabel}
                                                 </MDTypography>
                                                 <MDBox mb={1}>
                                                     <MDTypography
                                                         component="h2"
                                                         variant="h5"
                                                         textTransform="capitalize"
+                                                        sx={{ fontSize: { xs: 12, sm: 14, md: 16 } }}
                                                     >
-                                                        {parseFloat(project.surfaceUtile) + "m\u00b2, " + Math.round(project.estimation) + " " + (project.devise == "EUR" ? "\u20AC" : project.devise == "USD" ? "\u0024" : "FCFA")}
+                                                        {parseFloat(project.surfaceUtile) + "m\u00b2, " + Math.round(project.estimation).toLocaleString('fr-FR') + " " + (project.devise == "EUR" ? "\u20AC" : project.devise == "USD" ? "\u0024" : "FCFA")}
                                                     </MDTypography>
                                                 </MDBox>
                                                 <MDBox mb={3} lineHeight={0}>

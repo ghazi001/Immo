@@ -19,10 +19,10 @@ const Register = () => {
     const navigate = useNavigate();
 
     const [inputs, setInputs] = useState({
-        username: "",
+        lastName: "",
+        firstName: "",
         email: "",
         password: "",
-        name: "",
     });
     const [err, setErr] = useState(null);
     const handleChange = (e) => {
@@ -96,9 +96,9 @@ const Register = () => {
                         <MDBox component="form" role="form">
                             <MDBox mb={2}>
                                 <MDInput
-                                    name="name"
+                                    name="lastName"
                                     type="text"
-                                    label="Nom et pr&eacute;nom"
+                                    label="Nom"
                                     variant="standard"
                                     onChange={handleChange}
                                     fullWidth
@@ -106,9 +106,9 @@ const Register = () => {
                             </MDBox>
                             <MDBox mb={2}>
                                 <MDInput
-                                    name="username"
+                                    name="firstName"
                                     type="text"
-                                    label="Nom d'utilisateur"
+                                    label="Pr&eacute;nom"
                                     variant="standard"
                                     onChange={handleChange}
                                     fullWidth

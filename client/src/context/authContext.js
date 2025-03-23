@@ -67,7 +67,8 @@ export const AuthContextProvider = ({ children }) => {
 
     const updateInfo = async (inputs) => {
         var info = currentUser;
-        info.name = inputs.name;
+        info.userName = inputs.userName;
+        info.lastName = inputs.lastName;
         info.email = inputs.email;
         setCurrentUser(info);
         localStorage.setItem("user", JSON.stringify(info));

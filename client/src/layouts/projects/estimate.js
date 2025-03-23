@@ -390,21 +390,39 @@ function Estimate() {
                                                                 <TableRow>
                                                                     <TableCell>
                                                                     </TableCell>
-                                                                    <TableCell align="center" sx={{ fontWeight: 500 }}>Min</TableCell>
-                                                                    <TableCell align="center" sx={{ fontWeight: 500 }}>Budget estim&eacute;</TableCell>
-                                                                    <TableCell align="center" sx={{ fontWeight: 500 }}>Max</TableCell>
+                                                                    <TableCell align="center" sx={{ fontWeight: 500, padding: { xs: '4px 3px', sm: '8px 12px', md: '12px 16px' } }}>Min</TableCell>
+                                                                    <TableCell align="center" sx={{ fontWeight: 500, padding: { xs: '4px 3px', sm: '8px 12px', md: '12px 16px' } }}>Budget estim&eacute;</TableCell>
+                                                                    <TableCell align="center" sx={{ fontWeight: 500, padding: { xs: '4px 3px', sm: '8px 12px', md: '12px 16px' } }}>Max</TableCell>
                                                                 </TableRow>
                                                                 <>
                                                                     {corps && corps.map((corp, index) => (
                                                                         <TableRow key={index}>
-                                                                            <TableCell>{corp.LABEL}</TableCell>
-                                                                            <TableCell align="center">
+                                                                            <TableCell sx={{ padding: { xs: '4px 3px', sm: '8px 12px', md: '12px 16px' } }}>{corp.LABEL}</TableCell>
+                                                                            <TableCell align="center" sx={{
+                                                                                whiteSpace: 'nowrap',
+                                                                                minWidth: 100,
+                                                                                textOverflow: 'ellipsis',
+                                                                                overflow: 'hidden',
+                                                                                padding: { xs: '4px 3px', md: '12px 16px' }
+                                                                            }}>
                                                                                 {corp.Min}
                                                                             </TableCell>
-                                                                            <TableCell align="center">
+                                                                            <TableCell align="center" p={0} sx={{
+                                                                                whiteSpace: 'nowrap',
+                                                                                minWidth: 100,
+                                                                                textOverflow: 'ellipsis',
+                                                                                overflow: 'hidden',
+                                                                                padding: { xs: '4px 3px', md: '12px 16px' }
+                                                                            }}>
                                                                                 {Object.values(corp)[Object.keys(corp).findIndex(x => x.startsWith("Budget"))]}
                                                                             </TableCell>
-                                                                            <TableCell align="center">
+                                                                            <TableCell align="center" p={0} sx={{
+                                                                                whiteSpace: 'nowrap',
+                                                                                minWidth: 100,
+                                                                                textOverflow: 'ellipsis',
+                                                                                overflow: 'hidden',
+                                                                                padding: { xs: '4px 3px', md: '12px 16px!important' }
+                                                                            }}>
                                                                                 {corp.Max}
                                                                             </TableCell>
                                                                         </TableRow>

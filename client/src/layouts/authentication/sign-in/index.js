@@ -22,10 +22,9 @@ import bgImage from "assets/images/bg-sign-in-basic.jpeg";
 function Basic() {
     const { login } = useContext(AuthContext);
     const [err, setErr] = useState(null);
-    const navigate = useNavigate();
 
     const [inputs, setInputs] = useState({
-        username: "",
+        email: "",
         password: "",
     });
     const handleLogin = async (e) => {
@@ -61,7 +60,7 @@ function Basic() {
                 <MDBox pt={4} pb={3} px={3}>
                     <MDBox component="form" role="form">
                         <MDBox mb={2}>
-                            <MDInput type="email" label="Nom d'utilisateur" name="username" fullWidth onChange={handleChange} />
+                            <MDInput type="email" label="Email" name="email" fullWidth onChange={handleChange} />
                         </MDBox>
                         <MDBox mb={2}>
                             <MDInput type="password" label="Mot de passe" name="password" fullWidth onChange={handleChange} />
