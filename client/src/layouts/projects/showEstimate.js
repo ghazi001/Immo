@@ -148,6 +148,10 @@ function ShowEstimate({ project, setOpen, setWarningSB }) {
                 let result = await axios.post(`${url}/api/projects/addProject`, newProject);
                 if (result.status == 200) {
                     let id = result.data;
+                    try {
+                        await axios.post(`${url}/api/mails/sendMails?projectId=${id}`);
+                    } catch (err) {
+                    }
                     Initialize();
                     var list = listPerso;
                     await axios.post(`${url}/api/projects/addPerso?projectId=${id}`, list);

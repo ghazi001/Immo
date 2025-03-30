@@ -174,6 +174,10 @@ function NewProject() {
                 let result = await axios.post(`${url}/api/projects/addProject`, newProject);
                 if (result.status == 200) {
                     let id = result.data;
+                    try {
+                        await axios.post(`${url}/api/mails/sendMails?projectId=${id}`);
+                    } catch (err) {
+                    }
                     Initialize();
                     navigate(`/mes-projets/estimation/${id}`);
                 }

@@ -4,6 +4,8 @@ import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
 import Profile from "layouts/profile";
 import Estimate from "layouts/projects/estimate";
+import CoverPassword from "layouts/authentication/reset-password/cover";
+import ResetPassword from "layouts/authentication/reset-password";
 
 // @mui icons
 import Icon from "@mui/material/Icon";
@@ -71,6 +73,22 @@ const routes = [
         route: `/mes-projets/estimation/:id`,
         component: <Estimate />,
         state: "Connected",
+    },
+    {
+        type: "divider",
+        name: "sendEmail",
+        key: "sendEmail",
+        route: `/sendEmail`,
+        component: <CoverPassword />,
+        state: "Disconnected",
+    },
+    {
+        type: "divider",
+        name: "resetPassword",
+        key: "resetPassword",
+        route: `/resetPassword`,
+        component: <ResetPassword />,
+        state: "Disconnected",
     },
 ];
 

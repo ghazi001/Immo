@@ -86,6 +86,20 @@ function Basic() {
                                 </MDTypography>
                             </MDTypography>
                         </MDBox>
+                        <MDBox mt={1} mb={1} textAlign="center">
+                            <MDTypography variant="button" color="text">
+                                <MDTypography
+                                    component={Link}
+                                    to="/sendEmail"
+                                    variant="button"
+                                    color="info"
+                                    fontWeight="medium"
+                                    textGradient
+                                >
+                                    Mot de passe oubli&eacute;?
+                                </MDTypography>
+                            </MDTypography>
+                        </MDBox>
                     </MDBox>
                 </MDBox>
             </Card>
