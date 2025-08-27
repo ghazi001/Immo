@@ -9,7 +9,7 @@ export const AuthContextProvider = ({ children }) => {
     const [currentUser, setCurrentUser] = useState(JSON.parse(localStorage.getItem("user")) || null);
     const [newProject, setNewProject] = useState(null);
     const navigate = useNavigate();
-    const url = "http://188.165.231.114:8880";
+    const url = "https://simuximmo.com";
 
     const login = async (inputs) => {
         const res = await axios.post(`${url}/api/auth/login`, inputs);
